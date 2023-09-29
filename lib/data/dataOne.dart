@@ -17,8 +17,10 @@ class GlobalData extends ChangeNotifier {
   late String studentNumber;
   late String studentName;
   late String schoolName;
-  int butId = 0;
+
   bool isLoginSucceed = false;
+  int butId = 0;
+  bool matchStart = false;
 
   //可以将config作为参数传递
   Config config = Config();
@@ -35,6 +37,16 @@ class GlobalData extends ChangeNotifier {
       return;
     }
     butId = id;
+    notifyListeners();
+  }
+
+  void setLoginStatus() {
+    isLoginSucceed = false;
+    notifyListeners();
+  }
+
+  void setMatchStatus() {
+    matchStart = true;
     notifyListeners();
   }
 

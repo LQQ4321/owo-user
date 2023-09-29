@@ -3,6 +3,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:owo_user/data/constData.dart';
 import 'package:owo_user/data/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/macroWidget/dialogs.dart';
 
 // 导航栏，整个应用都会用到，一直固定在应用的顶部
 // 最左边是一个用户图标，中间是几个按钮，最右边是缩小，放大和关闭按钮
@@ -54,7 +55,9 @@ class UserCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: () {}, icon: Icon(Icons.person_outline));
+    return IconButton(onPressed: () async {
+      await MyDialogs.userStatus(context);
+    }, icon: Icon(Icons.person_outline));
   }
 }
 

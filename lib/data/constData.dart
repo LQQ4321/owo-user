@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ConstantData {
+
+  static List<int> timeRadix = [24 * 60 * 60,60 * 60,60];
+  static List<String> timeUnitName = ['Day','Hour','Minute','Second'];
+
   //路由的名称
   static List<String> routesName = [
     'Home','Problem','Status','News','Rank'

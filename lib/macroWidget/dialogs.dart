@@ -1,17 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
+import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/myProvider.dart';
 
 //各种对话框
 class MyDialogs {
   //代码复用
-  static Future<dynamic> showMyDialog(
-      BuildContext context, Widget widget) async {
+  static Future<dynamic> showMyDialog(BuildContext context, Widget widget,
+      {bool isBarrierDismissible = false}) async {
     return showDialog<dynamic>(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: isBarrierDismissible,
         builder: (BuildContext context) {
           return AlertDialog(content: widget);
         });
+  }
+
+  //感觉要想页面美观，各个组件之间的距离应该远一些，给人一种游刃有余的感觉
+  static Future<dynamic> userStatus(BuildContext context) {
+    return showMyDialog(context, Builder(builder: (context) {
+      List<String> userInfo = [];
+      userInfo.add(ChangeNotifierProvider.of<GlobalData>(context).studentName);
+      userInfo
+          .add(ChangeNotifierProvider.of<GlobalData>(context).studentNumber);
+      userInfo.add(ChangeNotifierProvider.of<GlobalData>(context).schoolName);
+      return Column(mainAxisSize: MainAxisSize.min, children: [
+        SizedBox(
+          width: 350,
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 90,
+                child: ClipOval(
+                  child: Image(
+                    image: AssetImage('assets/images/picture4.jpg'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 30),
+              Column(
+                  children: List.generate(userInfo.length, (index) {
+                return SizedBox(
+                  height: 30,
+                  width: 230,
+                  child: Text(
+                    userInfo[index],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 20),
+                  ),
+                );
+              }))
+            ],
+          ),
+        ),
+        Container(
+          height: 1,
+          color: Colors.black,
+          margin: const EdgeInsets.all(30),
+        ),
+        ElevatedButton(
+            onPressed: () {
+              ChangeNotifierProvider.of<GlobalData>(context).setLoginStatus();
+              Navigator.pop(context);
+            },
+            style: ButtonStyle(
+                minimumSize: MaterialStateProperty.all(const Size(350, 50)),
+                backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.redAccent)),
+            child: const Text(
+              'Logout',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
+            ))
+      ]);
+    }), isBarrierDismissible: true);
   }
 
   // 弹出一个信息,传递一个字符串列表，下标为0的是信息标题，下标为1的是详细信息，

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/components/guidance.dart';
+import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/pages/home.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -13,9 +16,15 @@ class _BodyState extends State<Body> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Guidance(),
+        const Guidance(),
         Container(height: 1,color: Colors.black,),
-        Expanded(child: Container())
+        Expanded(child: Builder(builder: (context){
+          int curButId = ChangeNotifierProvider.of<GlobalData>(context).butId;
+          if (curButId == 0) {
+            return const Home();
+          }
+          return Container();
+        },))
       ],
     );
   }

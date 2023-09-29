@@ -1,5 +1,94 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:owo_user/data/constData.dart';
+import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/macroWidget/funcOne.dart';
+
+class CountdownTimer extends StatefulWidget {
+  final String behindTime;
+
+  const CountdownTimer({Key? key, required this.behindTime}) : super(key: key);
+
+  @override
+  State<CountdownTimer> createState() => _CountdownTimerState();
+}
+
+class _CountdownTimerState extends State<CountdownTimer> {
+  Timer? _timer;
+  int _seconds = 10000;
+
+  @override
+  void initState() {
+    super.initState();
+    _seconds =
+        DateTime.parse(widget.behindTime).difference(DateTime.now()).inSeconds;
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        _seconds--;
+      });
+      if (_seconds <= 0){
+        ChangeNotifierProvider.of<GlobalData>(context).setMatchStatus();
+      }
+    });
+  }
+
+  //复用当前widget，不会调用initState，但是会调用didUpdateWidget
+  @override
+  void didUpdateWidget(_) {
+    _seconds =
+        DateTime.parse(widget.behindTime).difference(DateTime.now()).inSeconds;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer?.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100,
+      width: 450,
+      child: Row(
+        children: List.generate(ConstantData.timeUnitName.length, (index) {
+          return Expanded(
+              child: Container(
+            margin: const EdgeInsets.only(left: 5, right: 5),
+            padding: const EdgeInsets.only(bottom: 5),
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  FuncOne.addLeadingZero(
+                      FuncOne.getMatchRemainingTime(_seconds, index)),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 50),
+                ),
+                Text(
+                  ConstantData.timeUnitName[index],
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ));
+        }),
+      ),
+    );
+  }
+}
 
 //将一张图片从上到下逐渐变透明
 class FadeImage extends StatelessWidget {
