@@ -18,7 +18,7 @@ class CountdownTimer extends StatefulWidget {
 
 class _CountdownTimerState extends State<CountdownTimer> {
   Timer? _timer;
-  int _seconds = 10000;
+  late int _seconds;
 
   @override
   void initState() {

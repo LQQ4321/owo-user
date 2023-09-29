@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/dataTwo.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/pages/body.dart';
 import 'package:owo_user/pages/login.dart';
@@ -28,14 +29,17 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        data: GlobalData(),
-        child: const MaterialApp(
-          debugShowCheckedModeBanner: false,
-          // theme: ThemeData(),//等优化的时候再说吧
-          home: Scaffold(
+    // 程序启动到结束为止，这里应该只会运行一次吧，如果不止一次，就会导致程序运行过程中的数据丢失掉
+    // 将总数据提取出来，方便访问成员
+    GlobalData globalData = GlobalData();
+    return ChangeNotifierProvider<GlobalData>(
+        data: globalData,
+        child: ChangeNotifierProvider<ProblemModel>(
+          data: globalData.problemModel,
+          child: const MaterialApp(
+              home: Scaffold(
             body: HomePage(),
-          ),
+          )),
         ));
   }
 }
