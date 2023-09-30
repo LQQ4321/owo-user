@@ -5,6 +5,7 @@ import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/pages/body.dart';
 import 'package:owo_user/pages/login.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,10 +37,12 @@ class _MyAppState extends State<MyApp> {
         data: globalData,
         child: ChangeNotifierProvider<ProblemModel>(
           data: globalData.problemModel,
-          child: const MaterialApp(
-              home: Scaffold(
-            body: HomePage(),
-          )),
+          child: MaterialApp(
+              builder: BotToastInit(),
+              navigatorObservers: [BotToastNavigatorObserver()],
+              home: const Scaffold(
+                body: HomePage(),
+              )),
         ));
   }
 }

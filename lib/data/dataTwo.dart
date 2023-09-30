@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/myConfig.dart';
 
 //这里应该不用继承ChangeNotifier吧，如果是在该类里面调用notifyListeners方法才有必要继承
 class ExampleFile {
   late String exampleId;
   late String inFilePath;
   late String outFilePath;
+
+  ExampleFile(
+      {required this.exampleId,
+      required this.inFilePath,
+      required this.outFilePath});
+
+  factory ExampleFile.fromJson(String exampleFile) {
+    List<String> list = exampleFile.split('|');
+    return ExampleFile(
+        exampleId: list[0], inFilePath: list[1], outFilePath: list[2]);
+  }
+
+  @override
+  String toString() {
+    return '$exampleId - $inFilePath - $outFilePath';
+  }
 }
 
 class Problem {
@@ -18,19 +35,44 @@ class Problem {
   late List<ExampleFile> exampleFileList;
   late String submitTotal;
   late String submitAc;
+
+  Problem();
+
+//  书写对应的解析代码
+  factory Problem.fromJson(dynamic problem) {
+    var tempProblem = Problem();
+    tempProblem.problemId = problem['ID'].toString();
+    tempProblem.problemName = problem['ProblemName'];
+    tempProblem.pdf = problem['Pdf'];
+    tempProblem.timeLimit = problem['TimeLimit'].toString();
+    tempProblem.memoryLimit = problem['MemoryLimit'].toString();
+    tempProblem.maxFileLimit = problem['MaxFileLimit'].toString();
+    List<String> tempExamples = problem['ExampleFiles'].toString().split('#');
+    tempProblem.exampleFileList = List.generate(tempExamples.length,
+        (index) => ExampleFile.fromJson(tempExamples[index]));
+    tempProblem.submitTotal = problem['SubmitTotal'].toString();
+    tempProblem.submitAc = problem['SubmitAc'].toString();
+    return tempProblem;
+  }
+
+  @override
+  String toString() {
+    return '$problemId - $problemName - $pdf - $exampleFileList';
+  }
 }
 
 //应该尽量自己处理属于自己的数据
 class ProblemModel extends ChangeNotifier {
-  // 感觉没有必要单独设置一个变量来标记数据初始化过了没有
-  // 直接data == null来判断即可
-  // bool isRequest = false;//还没有请求过数据,初始化未完成
-  // TODO debug 为了方便调试
-  late List<Problem> problemList = List.generate(0, (index) => Problem());
+  //先初始化好
+  List<Problem> problemList = List.generate(0, (index) => Problem());
 
-  //  TODO 请求数据和处理数据的方法
-//当前浏览的是哪一道题目，因为这里的默认下标是0，TODO 所以至少要有一道题目才行
+//当前浏览的是哪一道题目，因为这里的默认下标是0
   int curProblem = 0;
+
+  //上一次的请求时间跟这一次的请求时间至少要距离requestGap
+  static const int requestGap = 60 * 5;
+  DateTime? latestRequestTime;
+
 
   void switchProblem(int id) {
     if (curProblem != id) {
@@ -50,5 +92,36 @@ class ProblemModel extends ChangeNotifier {
       //2.创建一个监听ProblemModel的ChangeNotifierProvider<ProblemModel>，这样就可以监听到了
       notifyListeners();
     }
+  }
+
+  //请求题目数据
+  Future<bool> requestProblemData(Config config, String contestId) async {
+    if (latestRequestTime != null &&
+        DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
+      return true;
+    }
+    latestRequestTime = DateTime.now();
+    Map request = {
+      'requestType': 'requestProblemsInfo',
+      'info': [contestId]
+    };
+    return await Config.dio
+        .post(config.netPath + Config.jsonRequest, data: request)
+        .then((value) {
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return false;
+      }
+      List problems = value.data['problems'] as List;
+      problemList = List.generate(problems.length, (index) {
+        return Problem.fromJson(problems[index]);
+      });
+      notifyListeners();
+      // debugPrint(problemList.length.toString());
+      // debugPrint(problemList.toString());
+      return true;
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      return false;
+    });
   }
 }

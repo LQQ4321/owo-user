@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
 import 'package:owo_user/data/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
@@ -21,29 +21,41 @@ class _GuidanceState extends State<Guidance> {
         height: 60,
         child: Row(
           children: [
-            SizedBox(width: 15),
-            UserCell(),
-            SizedBox(width: 15),
+            const SizedBox(width: 15),
+            const UserCell(),
+            const SizedBox(width: 15),
             Expanded(
-              flex: 5,
+                flex: 5,
                 child: MoveWindow(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "owo",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20),
-                ),
-              ),
-            )),
-            MidRoutes(),
-            Expanded(flex: 4,child: MoveWindow()),
-            SizedBox(width: 15),
-            IconButton(onPressed: (){}, icon: Icon(Icons.refresh)),
-            SizedBox(width: 15),
-            WindowButtons(),
+                  child: const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "owo",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20),
+                    ),
+                  ),
+                )),
+            const MidRoutes(),
+            Expanded(flex: 4, child: MoveWindow()),
+            const SizedBox(width: 15),
+            IconButton(
+                onPressed: () {
+                  MyDialogs.oneToast([
+                    'Refresh succeed',
+                    'The current page has fetched the latest data'
+                  ], duration: 5, infoStatus: 2);
+                  return;
+                  MyDialogs.oneToast([
+                    'Submit Succeed',
+                    'You may need to wait for a while to get the result'
+                  ]);
+                },
+                icon: const Icon(Icons.refresh)),
+            const SizedBox(width: 15),
+            const WindowButtons(),
           ],
         ));
   }
@@ -55,9 +67,11 @@ class UserCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: () async {
-      await MyDialogs.userStatus(context);
-    }, icon: Icon(Icons.person_outline));
+    return IconButton(
+        onPressed: () async {
+          await MyDialogs.userStatus(context);
+        },
+        icon: const Icon(Icons.person_outline));
   }
 }
 
@@ -76,11 +90,16 @@ class MidRoutes extends StatelessWidget {
         decoration: BoxDecoration(
             border: Border(
                 bottom: BorderSide(
-                    color: isBottom ?   Colors.black : Colors.transparent,
+                    color: isBottom ? Colors.black : Colors.transparent,
                     width: 2.0))),
         child: TextButton(
-          onPressed: () {
+          onPressed: () async {
             ChangeNotifierProvider.of<GlobalData>(context).setButId(index);
+            if (index == 1) {
+              bool flag = await ChangeNotifierProvider.of<GlobalData>(context)
+                  .requestProblemData();
+              debugPrint(flag.toString());
+            }
           },
           child: Text(
             ConstantData.routesName[index],
@@ -108,6 +127,7 @@ final closeButtonColors = WindowButtonColors(
 
 class WindowButtons extends StatelessWidget {
   const WindowButtons({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -120,4 +140,3 @@ class WindowButtons extends StatelessWidget {
     );
   }
 }
-

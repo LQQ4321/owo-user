@@ -24,7 +24,7 @@ class _BodyState extends State<Body> {
           color: Colors.black,
         ),
         Expanded(child: Builder(
-          builder: (context) {
+          builder: (context){
             int curButId = ChangeNotifierProvider.of<GlobalData>(context).butId;
             if (curButId == 0) {
               return const Home();

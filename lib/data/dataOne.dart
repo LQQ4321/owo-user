@@ -69,5 +69,10 @@ class GlobalData extends ChangeNotifier {
     notifyListeners();
     return true;
   }
+
 //  ProblemModel field
+  // 有空研究一下是不是这里是不是一定要加上async关键字
+  Future<bool> requestProblemData() async {
+    return await problemModel.requestProblemData(config, contestId);
+  }
 }

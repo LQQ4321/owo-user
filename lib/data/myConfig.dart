@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 //配置信息
 class Config {
+  //确保全局只有一个Dio实例，节省空间
   static var dio = Dio();
   static const String jsonRequest = "/studentJson";
   static const String formRequest = "/studentForm";
