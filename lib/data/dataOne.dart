@@ -75,4 +75,20 @@ class GlobalData extends ChangeNotifier {
   Future<bool> requestProblemData() async {
     return await problemModel.requestProblemData(config, contestId);
   }
+
+  //下载题目文件
+  Future<bool> downloadProblemFile() async {
+    return await problemModel.downloadProblemFile(config, contestId);
+  }
+
+//  下载样例文件
+  Future<bool> downloadExampleFile(int columnIndex, int rowIndex) async {
+    return await problemModel.downloadExampleFile(
+        config, contestId, columnIndex, rowIndex);
+  }
+
+//  提交代码文件
+  Future<int> submitCodeFile() async {
+    return await problemModel.submitCodeFile(config, studentNumber, contestId);
+  }
 }

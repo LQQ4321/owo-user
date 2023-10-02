@@ -7,6 +7,72 @@ import 'package:owo_user/data/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';
 
+//比例组件
+class RatioBar extends StatelessWidget {
+  const RatioBar({Key? key, required this.numerator, required this.denominator})
+      : super(key: key);
+
+  final int numerator;
+  final int denominator;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      // debugPrint(constraints.toString());
+      return Center(
+        child: Container(
+          height: 40,
+          padding: const EdgeInsets.only(right: 5, left: 5),
+          child: Column(
+            children: [
+              Stack(children: [
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '$numerator / $denominator',
+                      style: const TextStyle(color: Colors.grey),
+                    ))
+              ]),
+              Expanded(
+                child: Center(
+                  child: SizedBox(
+                    height: 8,
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        Container(
+                          width: (constraints.maxWidth - 10 < 0 ? 0 : constraints.maxWidth - 10) *
+                              (denominator == 0 ? 1 : numerator / denominator),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.only(
+                                topLeft: const Radius.circular(4),
+                                bottomLeft: const Radius.circular(4),
+                                topRight: Radius.circular(
+                                    numerator == denominator ? 4 : 0),
+                                bottomRight: Radius.circular(
+                                    numerator == denominator ? 4 : 0)),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+}
+
 class CountdownTimer extends StatefulWidget {
   final String behindTime;
 
@@ -29,7 +95,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
       setState(() {
         _seconds--;
       });
-      if (_seconds <= 0){
+      if (_seconds <= 0) {
         ChangeNotifierProvider.of<GlobalData>(context).setMatchStatus();
       }
     });

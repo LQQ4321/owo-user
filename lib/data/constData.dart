@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 class ConstantData {
+  static List<String> languages = ['c', 'c++', 'golang', 'java', 'python3'];
+  static List<String> fileSuffix = ['c', 'cpp', 'go', 'java', 'py'];
 
-  static List<int> timeRadix = [24 * 60 * 60,60 * 60,60];
-  static List<String> timeUnitName = ['Day','Hour','Minute','Second'];
+  static List<int> timeRadix = [24 * 60 * 60, 60 * 60, 60];
+  static List<String> timeUnitName = ['Day', 'Hour', 'Minute', 'Second'];
 
   //路由的名称
   static List<String> routesName = [
-    'Home','Problem','Status','News','Rank'
+    'Home',
+    'Problem',
+    'Status',
+    'News',
+    'Rank'
   ];
 
   // 信息框内的颜色

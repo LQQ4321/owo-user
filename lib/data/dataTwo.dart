@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/constData.dart';
 import 'package:owo_user/data/myConfig.dart';
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+
+import 'package:owo_user/macroWidget/funcOne.dart';
 
 //这里应该不用继承ChangeNotifier吧，如果是在该类里面调用notifyListeners方法才有必要继承
 class ExampleFile {
@@ -32,7 +38,7 @@ class Problem {
   late String timeLimit;
   late String memoryLimit;
   late String maxFileLimit;
-  late List<ExampleFile> exampleFileList;
+  List<ExampleFile> exampleFileList = [];
   late String submitTotal;
   late String submitAc;
 
@@ -72,7 +78,6 @@ class ProblemModel extends ChangeNotifier {
   //上一次的请求时间跟这一次的请求时间至少要距离requestGap
   static const int requestGap = 60 * 5;
   DateTime? latestRequestTime;
-
 
   void switchProblem(int id) {
     if (curProblem != id) {
@@ -122,6 +127,122 @@ class ProblemModel extends ChangeNotifier {
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       return false;
+    });
+  }
+
+// 下载题目描述文件
+  Future<bool> downloadProblemFile(Config config, String contestId) async {
+    //先构建文件名
+    String filePath =
+        '${String.fromCharCode(65 + curProblem)}_problem$contestId.pdf';
+    //如果能够找到准备要下载的文件,那打开其所在文件夹即可
+    if (await config.isExistFile(config.downloadFilePath, filePath)) {
+      config.openFolder(config.downloadFilePath);
+      return true;
+    }
+    Map request = {
+      'requestType': 'downloadPdfFile',
+      'info': ['$contestId/${problemList[curProblem].problemId}/problem.pdf']
+    };
+    bool flag = false;
+    try {
+      Response response = await Config.dio.post(
+          config.netPath + Config.jsonRequest,
+          data: request,
+          options: Options(responseType: ResponseType.bytes));
+      File file = File(config.downloadFilePath + filePath);
+      await file.writeAsBytes(response.data);
+      flag = true;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    if (flag) {
+      config.openFolder(config.downloadFilePath);
+    }
+    return flag;
+  }
+
+//  下载样例文件
+  Future<bool> downloadExampleFile(
+      Config config, String contestId, int columnIndex, int rowIndex) async {
+    //先构建文件名
+    String fileName =
+        '${String.fromCharCode(65 + curProblem)}_${rowIndex == 1 ? 'in' : 'out'}${columnIndex + 1}.txt';
+    if (await config.isExistFile(config.downloadFilePath, fileName)) {
+      config.openFolder(config.downloadFilePath);
+      return true;
+    }
+    debugPrint(fileName);
+    String filePath =
+        problemList[curProblem].exampleFileList[columnIndex].inFilePath;
+    if (rowIndex == 2) {
+      filePath =
+          problemList[curProblem].exampleFileList[columnIndex].outFilePath;
+    }
+    debugPrint(filePath);
+    Map request = {
+      'requestType': 'downloadExampleFile',
+      'info': [filePath]
+    };
+    // bool flag = false;
+    return await Config.dio
+        .post(config.netPath + Config.jsonRequest, data: request)
+        .then((value) async {
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return false;
+      }
+      final file = File(config.downloadFilePath + fileName);
+      await file.writeAsString(value.data['exampleFile']);
+      config.openFolder(config.downloadFilePath);
+      return true;
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      return false;
+    });
+    // return flag;
+  }
+
+//  提交代码文件
+  //0表示提交成功，1表示没有选中文件，2表示提交文件过大，3表示不支持该文件类型，4表示提交文件提交失败
+  Future<int> submitCodeFile(
+      Config config, String studentNumber, String contestId) async {
+    FilePickerResult? filePickerResult =
+        await config.selectAFile(ConstantData.fileSuffix);
+    if (filePickerResult == null) {
+      return 1;
+    }
+    //这里比较的单位是kb
+    if ((filePickerResult.files.single.size >> 10) >
+        int.parse(problemList[curProblem].maxFileLimit)) {
+      return 2;
+    }
+    String language = 'other';
+    for (int i = 0; i < ConstantData.fileSuffix.length; i++) {
+      if (filePickerResult.files.single.name
+          .endsWith(ConstantData.fileSuffix[i])) {
+        language = ConstantData.languages[i];
+      }
+    }
+    if (language == 'other') {
+      return 3;
+    }
+    FormData formData = FormData.fromMap({
+      'requestType': 'submitCode',
+      'file': await MultipartFile.fromFile(filePickerResult.files.single.path!,
+          filename: filePickerResult.files.single.name),
+      'contestId': contestId,
+      'problemId': problemList[curProblem].problemId,
+      'studentNumber': studentNumber,
+      'language': language,
+      'submitTime': FuncOne.getCurFormatTime()
+    });
+    return await Config.dio
+        .post(config.netPath + Config.formRequest, data: formData)
+        .then((value) {
+      return value.data[Config.returnStatus] == Config.succeedStatus ? 0 : 4;
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      return 4;
     });
   }
 }

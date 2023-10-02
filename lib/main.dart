@@ -33,6 +33,8 @@ class _MyAppState extends State<MyApp> {
     // 程序启动到结束为止，这里应该只会运行一次吧，如果不止一次，就会导致程序运行过程中的数据丢失掉
     // 将总数据提取出来，方便访问成员
     GlobalData globalData = GlobalData();
+    //调用获取主机用户名方法
+    globalData.config.setHostUserName();
     return ChangeNotifierProvider<GlobalData>(
         data: globalData,
         child: ChangeNotifierProvider<ProblemModel>(

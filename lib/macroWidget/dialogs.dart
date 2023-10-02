@@ -17,6 +17,29 @@ class MyDialogs {
         });
   }
 
+  //进度显示器，但是进度只是给用户看的，消除用户的等待疲劳
+  static Future<dynamic> processingBar(BuildContext context, String text) {
+    return showMyDialog(context, Builder(builder: (context) {
+      return Container(
+        width: 300,
+        height: 100,
+        child: Column(
+          children: [
+            Text(text,
+                style: const TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w300,
+                    fontSize: 20)),
+            const SizedBox(height: 30),
+            LinearProgressIndicator(
+                backgroundColor: Colors.grey[200],
+                valueColor: const AlwaysStoppedAnimation(Colors.grey))
+          ],
+        ),
+      );
+    }));
+  }
+
   //感觉要想页面美观，各个组件之间的距离应该远一些，给人一种游刃有余的感觉
   static Future<dynamic> userStatus(BuildContext context) {
     return showMyDialog(context, Builder(builder: (context) {
@@ -176,7 +199,8 @@ class MyDialogs {
   }
 
 //  创建一个右上角的Toast，方便显示一条不需要选手作出回复的消息，只需要选手知道即可，一段事件后会自己消失
-  static VoidCallback oneToast(List<String> texts, {int infoStatus = 1,int duration = 10}) {
+  static VoidCallback oneToast(List<String> texts,
+      {int infoStatus = 1, int duration = 10}) {
     return BotToast.showCustomText(
         toastBuilder: (context) {
           return Container(
