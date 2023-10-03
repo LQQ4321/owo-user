@@ -21,4 +21,7 @@ class User {
 
 class UserModel extends ChangeNotifier {
   late List<User> userList;
+  //上一次的请求时间跟这一次的请求时间至少要距离requestGap
+  static const int requestGap = 60 * 3;
+  DateTime? latestRequestTime;
 }

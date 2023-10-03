@@ -5,28 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 
-//过滤文件后缀名示例
-// class FilePickerScreen extends StatelessWidget {
-//   Future<void> _openFolderAndSelectFile() async {
-//     FilePickerResult? result = await FilePicker.platform.pickFiles(
-//       type: FileType.custom,
-//       allowedExtensions: ['txt', 'pdf', 'doc'],
-//       allowMultiple: false,
-//       withData: true,
-//     );
-//
-//     if (result != null) {
-//       // 获取选中的文件
-//       PlatformFile file = result.files.first;
-//
-//       // 打印文件路径和其他信息
-//       print('文件路径：${file.path}');
-//       print('文件大小：${file.size}');
-//       print('文件扩展名：${file.extension}');
-//       print('文件名：${file.name}');
-//     }
-//   }
-
 //配置信息
 class Config {
   //确保全局只有一个Dio实例，节省空间
@@ -39,6 +17,7 @@ class Config {
 
   late String netPath;
   late String hostUserName;
+  //如果不能得到用户名，应该让downloadFilePath为空，这样下载下来的文件应该是跟该程序在同一个目录下
   late String downloadFilePath;
 
   //根据给定的后缀，选择一个文件

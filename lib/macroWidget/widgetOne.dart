@@ -91,13 +91,19 @@ class _CountdownTimerState extends State<CountdownTimer> {
     super.initState();
     _seconds =
         DateTime.parse(widget.behindTime).difference(DateTime.now()).inSeconds;
+    if(_seconds < 0 ){
+      _seconds = 0;
+    }
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      if (_seconds <= 0) {
+        if(ChangeNotifierProvider.of<GlobalData>(context).matchStart){
+          timer.cancel();
+        }
+        ChangeNotifierProvider.of<GlobalData>(context).setMatchStatus();
+      }
       setState(() {
         _seconds--;
       });
-      if (_seconds <= 0) {
-        ChangeNotifierProvider.of<GlobalData>(context).setMatchStatus();
-      }
     });
   }
 
@@ -106,6 +112,9 @@ class _CountdownTimerState extends State<CountdownTimer> {
   void didUpdateWidget(_) {
     _seconds =
         DateTime.parse(widget.behindTime).difference(DateTime.now()).inSeconds;
+    if(_seconds < 0) {
+      _seconds = 0;
+    }
   }
 
   @override

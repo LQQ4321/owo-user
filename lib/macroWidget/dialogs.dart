@@ -86,7 +86,7 @@ class MyDialogs {
         ),
         ElevatedButton(
             onPressed: () {
-              ChangeNotifierProvider.of<GlobalData>(context).setLoginStatus();
+              ChangeNotifierProvider.of<GlobalData>(context).logout();
               Navigator.pop(context);
             },
             style: ButtonStyle(

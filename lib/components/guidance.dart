@@ -96,9 +96,15 @@ class MidRoutes extends StatelessWidget {
           onPressed: () async {
             ChangeNotifierProvider.of<GlobalData>(context).setButId(index);
             if (index == 1) {
-              bool flag = await ChangeNotifierProvider.of<GlobalData>(context)
+              await ChangeNotifierProvider.of<GlobalData>(context)
                   .requestProblemData();
-              debugPrint(flag.toString());
+            } else if(index == 2){
+              await ChangeNotifierProvider.of<GlobalData>(context)
+                  .requestSubmitData();
+            }else if(index == 3){
+
+            }else if(index == 4){
+
             }
           },
           child: Text(

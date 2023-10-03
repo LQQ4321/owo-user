@@ -145,14 +145,18 @@ class _ProblemInfo extends StatelessWidget {
                             color: Colors.grey,
                           ),
                         )),
-                    Text(
-                      problemModel.problemList[curProblemId].problemName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          problemModel.problemList[curProblemId].problemName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -350,8 +354,8 @@ class _SrcLimit extends StatelessWidget {
                 iconText,
                 style: TextStyle(
                     color: Colors.grey,
-                    fontWeight: FontWeight.w700,
-                    fontSize: iconText == 'T' ? 33 : 30),
+                    fontWeight: FontWeight.w600,
+                    fontSize: iconText == 'T' ? 35 : 30),
               ),
             ),
           ),
@@ -362,16 +366,16 @@ class _SrcLimit extends StatelessWidget {
               Text(
                 'C/C++',
                 style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300),
+                    color: Colors.black54,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400),
               ),
               Text(
                 'Other',
                 style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300),
+                    color: Colors.black54,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400),
               ),
             ],
           )),
@@ -382,16 +386,16 @@ class _SrcLimit extends StatelessWidget {
               Text(
                 limitText,
                 style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300),
+                    color: Colors.black54,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400),
               ),
               const Text(
                 'twice',
                 style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300),
+                    color: Colors.black54,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400),
               ),
             ],
           )),
@@ -401,12 +405,4 @@ class _SrcLimit extends StatelessWidget {
   }
 }
 
-//显示样例列表的组件
-class _ExampleList extends StatelessWidget {
-  const _ExampleList({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}

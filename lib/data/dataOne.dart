@@ -40,8 +40,13 @@ class GlobalData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setLoginStatus() {
+  void logout() {
     isLoginSucceed = false;
+    //清理缓存数据(懒删除,并没有真正的删除)
+    problemModel.latestRequestTime = null;
+    userModel.latestRequestTime = null;
+    submitModel.latestRequestTime = null;
+    newsModel.latestRequestTime = null;
     notifyListeners();
   }
 
@@ -90,5 +95,11 @@ class GlobalData extends ChangeNotifier {
 //  提交代码文件
   Future<int> submitCodeFile() async {
     return await problemModel.submitCodeFile(config, studentNumber, contestId);
+  }
+
+//  SubmitModel field
+  Future<bool> requestSubmitData() async {
+    return await submitModel.requestSubmitData(
+        config, contestId, studentNumber, problemModel.problemList);
   }
 }

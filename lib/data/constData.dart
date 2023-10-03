@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ConstantData {
+
+  static List<String> statusTitles = [
+    'Id',
+    'Problem',
+    'Status',
+    'Language',
+    'Time'
+  ];
+
   static List<String> languages = ['c', 'c++', 'golang', 'java', 'python3'];
   static List<String> fileSuffix = ['c', 'cpp', 'go', 'java', 'py'];
 
@@ -18,22 +27,22 @@ class ConstantData {
 
   // 信息框内的颜色
   static List<Color> statusColors = [
-    Colors.grey[100]!,
+    Colors.green[100]!,
     Colors.orange[100]!,
-    Colors.green[100]!
+    Colors.redAccent[100]!
   ];
 
   // 信息框的颜色
   static const List<Color> borderColors = [
-    Colors.grey,
+    Colors.green,
     Colors.orange,
-    Colors.green
+    Colors.red
   ];
 
   // 每种状态对应的图标
   static const List<Icon> infoIcons = [
-    Icon(Icons.info, color: Colors.grey),
-    Icon(Icons.warning, color: Colors.deepOrangeAccent),
-    Icon(Icons.gpp_good, color: Colors.green),
+    Icon(Icons.gpp_good, color: Colors.greenAccent),
+    Icon(Icons.error, color: Colors.deepOrangeAccent),
+    Icon(Icons.warning, color: Colors.redAccent),
   ];
 }

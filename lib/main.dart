@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/dataFive.dart';
+import 'package:owo_user/data/dataFour.dart';
 import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/dataThree.dart';
 import 'package:owo_user/data/dataTwo.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/pages/body.dart';
@@ -38,14 +41,20 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider<GlobalData>(
         data: globalData,
         child: ChangeNotifierProvider<ProblemModel>(
-          data: globalData.problemModel,
-          child: MaterialApp(
-              builder: BotToastInit(),
-              navigatorObservers: [BotToastNavigatorObserver()],
-              home: const Scaffold(
-                body: HomePage(),
-              )),
-        ));
+            data: globalData.problemModel,
+            child: ChangeNotifierProvider<SubmitModel>(
+                data: globalData.submitModel,
+                child: ChangeNotifierProvider<NewsModel>(
+                    data: globalData.newsModel,
+                    child: ChangeNotifierProvider<UserModel>(
+                      data: globalData.userModel,
+                      child: MaterialApp(
+                          builder: BotToastInit(),
+                          navigatorObservers: [BotToastNavigatorObserver()],
+                          home: const Scaffold(
+                            body: HomePage(),
+                          )),
+                    )))));
   }
 }
 
@@ -55,7 +64,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.of<GlobalData>(context).isLoginSucceed
-        ? Body()
+        ? const Body()
         : const Login();
   }
 }

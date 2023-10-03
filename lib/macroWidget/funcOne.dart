@@ -3,6 +3,16 @@ import 'package:owo_user/data/constData.dart';
 
 //一个包含多个静态方法的函数类，主要是为了处理数据
 class FuncOne {
+  //输入一个状态，得到一个对应的颜色
+  static Color getStatusColor(String status) {
+    if (status == 'FirstAc' || status == 'Accepted') {
+      return ConstantData.borderColors[0];
+    } else if (status == 'Pending') {
+      return ConstantData.borderColors[1];
+    }
+    return ConstantData.borderColors[2];
+  }
+
   //输出对应单位的剩余时间
   static int getMatchRemainingTime(int seconds, int index) {
     if (index == 0) {
