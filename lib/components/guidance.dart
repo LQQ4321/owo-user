@@ -98,14 +98,13 @@ class MidRoutes extends StatelessWidget {
             if (index == 1) {
               await ChangeNotifierProvider.of<GlobalData>(context)
                   .requestProblemData();
-            } else if(index == 2){
+            } else if (index == 2) {
               await ChangeNotifierProvider.of<GlobalData>(context)
                   .requestSubmitData();
-            }else if(index == 3){
-
-            }else if(index == 4){
-
-            }
+            } else if (index == 3) {
+              await ChangeNotifierProvider.of<GlobalData>(context)
+                  .requestNewsData();
+            } else if (index == 4) {}
           },
           child: Text(
             ConstantData.routesName[index],

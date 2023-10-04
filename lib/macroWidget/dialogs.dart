@@ -200,7 +200,7 @@ class MyDialogs {
 
 //  创建一个右上角的Toast，方便显示一条不需要选手作出回复的消息，只需要选手知道即可，一段事件后会自己消失
   static VoidCallback oneToast(List<String> texts,
-      {int infoStatus = 1, int duration = 10}) {
+      {int infoStatus = 0, int duration = 10}) {
     return BotToast.showCustomText(
         toastBuilder: (context) {
           return Container(

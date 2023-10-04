@@ -12,13 +12,22 @@ class Status extends StatelessWidget {
     List<OneSubmit> submitList =
         ChangeNotifierProvider.of<SubmitModel>(context).submitList;
     return Center(
-      child: SizedBox(
+      child: Container(
         width: 800,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(1.0, 1.0),
+                  blurRadius: 2.0)
+            ]),
         child: Column(
           children: [
             Container(
               height: 30,
-              margin: const EdgeInsets.only(right: 15),
+              margin: const EdgeInsets.only(left:15,right: 15),
               color: Colors.grey[200],
               child: Row(
                 children:
@@ -43,7 +52,7 @@ class Status extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
                         height: 45,
-                        margin: const EdgeInsets.only(right: 15),
+                        margin: const EdgeInsets.only(left:15,right: 15),
                         child: Row(
                             children: List.generate(5, (rowIndex) {
                           String text = '';
@@ -79,7 +88,7 @@ class Status extends StatelessWidget {
                     separatorBuilder: (BuildContext context, int index) {
                       return Container(
                           height: 1,
-                          margin: const EdgeInsets.only(right: 15),
+                          // margin: const EdgeInsets.only(right: 15),
                           color: Colors.grey);
                     },
                     itemCount: submitList.length))
