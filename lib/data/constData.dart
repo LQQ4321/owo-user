@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 class ConstantData {
 
+  static List<String> statusType = [
+    "FirstAc",
+    "Accepted",
+    "Pending",
+  ];
+
   static List<String> statusTitles = [
     'Id',
     'Problem',

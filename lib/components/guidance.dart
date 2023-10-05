@@ -104,7 +104,9 @@ class MidRoutes extends StatelessWidget {
             } else if (index == 3) {
               await ChangeNotifierProvider.of<GlobalData>(context)
                   .requestNewsData();
-            } else if (index == 4) {}
+            } else if (index == 4) {
+              await ChangeNotifierProvider.of<GlobalData>(context).requestRankData();
+            }
           },
           child: Text(
             ConstantData.routesName[index],

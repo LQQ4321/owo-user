@@ -113,4 +113,18 @@ class GlobalData extends ChangeNotifier {
   Future<bool> requestNewsData() async {
     return await newsModel.requestNewsData(config, contestId, studentNumber);
   }
+
+//  UsersModel field
+  Future<bool> requestRankData() async {
+    //最后一个小时不能申请查看排名数据，此时已经封榜了
+    if (DateTime.parse(endTime).difference(DateTime.now()).inSeconds <
+        60 * 60) {
+      return false;
+    }
+    if (await requestProblemData()) {
+      return await userModel.requestRankData(config, contestId, studentNumber,
+          startTime, problemModel.problemList);
+    }
+    return false;
+  }
 }

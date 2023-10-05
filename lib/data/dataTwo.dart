@@ -53,9 +53,12 @@ class Problem {
     tempProblem.timeLimit = problem['TimeLimit'].toString();
     tempProblem.memoryLimit = problem['MemoryLimit'].toString();
     tempProblem.maxFileLimit = problem['MaxFileLimit'].toString();
-    List<String> tempExamples = problem['ExampleFiles'].toString().split('#');
-    tempProblem.exampleFileList = List.generate(tempExamples.length,
-        (index) => ExampleFile.fromJson(tempExamples[index]));
+    //可能是空字符串，这里是二维部分，
+    if (problem['ExampleFiles'].toString().isNotEmpty) {
+      List<String> tempExamples = problem['ExampleFiles'].toString().split('#');
+      tempProblem.exampleFileList = List.generate(tempExamples.length,
+          (index) => ExampleFile.fromJson(tempExamples[index]));
+    }
     tempProblem.submitTotal = problem['SubmitTotal'].toString();
     tempProblem.submitAc = problem['SubmitAc'].toString();
     return tempProblem;
@@ -116,6 +119,7 @@ class ProblemModel extends ChangeNotifier {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
       }
+      // debugPrint(value.data['problems'].toString());
       List problems = value.data['problems'] as List;
       problemList = List.generate(problems.length, (index) {
         return Problem.fromJson(problems[index]);
