@@ -82,6 +82,12 @@ class ProblemModel extends ChangeNotifier {
   static const int requestGap = 60 * 5;
   DateTime? latestRequestTime;
 
+  void cleanCacheData(){
+    latestRequestTime = null;
+    problemList.clear();
+    notifyListeners();
+  }
+
   void switchProblem(int id) {
     if (curProblem != id) {
       curProblem = id;
@@ -161,6 +167,7 @@ class ProblemModel extends ChangeNotifier {
       debugPrint(e.toString());
     }
     if (flag) {
+      //如果把文件名也加上去的话，那就是直接打开文件了
       config.openFolder(config.downloadFilePath);
     }
     return flag;

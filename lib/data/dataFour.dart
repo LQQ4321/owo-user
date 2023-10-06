@@ -34,6 +34,12 @@ class SubmitModel extends ChangeNotifier {
   static const int requestGap = 60 * 3;
   DateTime? latestRequestTime;
 
+  void cleanCacheData(){
+    latestRequestTime = null;
+    submitList.clear();
+    notifyListeners();
+  }
+
   Future<bool> requestSubmitData(Config config, String contestId,
       String studentNumber, List<Problem> problemList) async {
     if (latestRequestTime != null &&

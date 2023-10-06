@@ -45,9 +45,9 @@ class GlobalData extends ChangeNotifier {
     butId = 0;
     matchStart = false;
     //清理缓存数据(懒删除,通过将请求数据的时间间隔标记为null,并没有真正的删除)
-    problemModel.latestRequestTime = null;
-    userModel.latestRequestTime = null;
-    submitModel.latestRequestTime = null;
+    problemModel.cleanCacheData();
+    userModel.cleanCacheData();
+    submitModel.cleanCacheData();
     newsModel.cleanCacheData();
     notifyListeners();
   }
@@ -55,6 +55,19 @@ class GlobalData extends ChangeNotifier {
   void setMatchStatus() {
     matchStart = true;
     notifyListeners();
+  }
+
+  Future<bool> updateCurPageData() async {
+    if (butId == 1) {
+      return await requestProblemData();
+    } else if (butId == 2) {
+      return await requestSubmitData();
+    } else if (butId == 3) {
+      return await requestNewsData();
+    } else if (butId == 4) {
+      return await requestRankData();
+    }
+    return true;
   }
 
 //  config field
@@ -80,6 +93,9 @@ class GlobalData extends ChangeNotifier {
 //  ProblemModel field
   // 有空研究一下是不是这里是不是一定要加上async关键字
   Future<bool> requestProblemData() async {
+    if(DateTime.parse(startTime).difference(DateTime.now()).inSeconds > 0) {
+      return false;
+    }
     return await problemModel.requestProblemData(config, contestId);
   }
 
@@ -117,10 +133,11 @@ class GlobalData extends ChangeNotifier {
 //  UsersModel field
   Future<bool> requestRankData() async {
     //最后一个小时不能申请查看排名数据，此时已经封榜了
-    if (DateTime.parse(endTime).difference(DateTime.now()).inSeconds <
-        60 * 60) {
-      return false;
-    }
+    //TODO 为了方便调试，先暂时取消封榜功能
+    // if (DateTime.parse(endTime).difference(DateTime.now()).inSeconds <
+    //     60 * 60) {
+    //   return false;
+    // }
     if (await requestProblemData()) {
       return await userModel.requestRankData(config, contestId, studentNumber,
           startTime, problemModel.problemList);

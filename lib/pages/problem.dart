@@ -10,19 +10,34 @@ class ProblemBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.grey[300],
-        child: Row(
-          children: [
-            const _QuestionList(),
-            Expanded(
-                child: Column(
-              children: const [
-                Expanded(child: _ProblemInfo()),
+    int problemNumber =
+        ChangeNotifierProvider.of<ProblemModel>(context).problemList.length;
+    return problemNumber > 0
+        ? Container(
+            color: Colors.grey[100],
+            child: Row(
+              children: [
+                const _QuestionList(),
+                Expanded(
+                    child: Column(
+                  children: const [
+                    Expanded(child: _ProblemInfo()),
+                  ],
+                ))
               ],
             ))
-          ],
-        ));
+        : Container(
+            color: Colors.grey,
+            child: const Center(
+              child: Text(
+                'Not exists any problems',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+          );
   }
 }
 
@@ -47,34 +62,32 @@ class _QuestionList extends StatelessWidget {
                   offset: Offset(1.0, 1.0),
                   blurRadius: 2.0)
             ]),
-        child: inProblemModel.problemList.isEmpty
-            ? null
-            : ListView.builder(
-                itemCount: inProblemModel.problemList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    color: inProblemModel.curProblem == index
-                        ? Colors.grey[200]
-                        : Colors.transparent,
-                    child: TextButton(
-                        onPressed: () {
-                          inProblemModel.switchProblem(index);
-                        },
-                        style: ButtonStyle(
-                            minimumSize:
-                                MaterialStateProperty.all(const Size(65, 50))),
-                        child: Text(
-                          String.fromCharCode(65 + index),
-                          style: TextStyle(
-                              color: inProblemModel.problemList[index].isAc
-                                  ? Colors.lightGreenAccent
-                                  : Colors.black87,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w300),
-                        )),
-                  );
-                }));
+        child: ListView.builder(
+            itemCount: inProblemModel.problemList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                padding: const EdgeInsets.only(left: 5, right: 5),
+                color: inProblemModel.curProblem == index
+                    ? Colors.grey[200]
+                    : Colors.transparent,
+                child: TextButton(
+                    onPressed: () {
+                      inProblemModel.switchProblem(index);
+                    },
+                    style: ButtonStyle(
+                        minimumSize:
+                            MaterialStateProperty.all(const Size(65, 50))),
+                    child: Text(
+                      String.fromCharCode(65 + index),
+                      style: TextStyle(
+                          color: inProblemModel.problemList[index].isAc
+                              ? Colors.lightGreenAccent
+                              : Colors.black87,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w300),
+                    )),
+              );
+            }));
   }
 }
 
@@ -87,14 +100,7 @@ class _ProblemInfo extends StatelessWidget {
         ChangeNotifierProvider.of<ProblemModel>(context);
     int curProblemId =
         ChangeNotifierProvider.of<ProblemModel>(context).curProblem;
-    return problemModel.problemList.isEmpty
-        ? const Center(
-            child: Text(
-            'Not any problems',
-            style: TextStyle(
-                color: Colors.grey, fontSize: 30, fontWeight: FontWeight.w400),
-          ))
-        : Container(
+    return Container(
             width: double.infinity,
             height: double.infinity,
             margin:
@@ -127,10 +133,10 @@ class _ProblemInfo extends StatelessWidget {
                             //不管怎么样，这一行代码都要执行
                             Navigator.pop(context);
                             if (flag) {
-                              MyDialogs.oneToast(['download file succeed', ''],
+                              MyDialogs.oneToast(['Download file succeed', ''],
                                   infoStatus: 2);
                             } else {
-                              MyDialogs.oneToast(['download file fail', ''],
+                              MyDialogs.oneToast(['Download file fail', ''],
                                   infoStatus: 1);
                             }
                           },
@@ -404,5 +410,3 @@ class _SrcLimit extends StatelessWidget {
     );
   }
 }
-
-

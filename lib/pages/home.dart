@@ -16,9 +16,6 @@ class _HomeState extends State<Home> {
     String startTime = ChangeNotifierProvider.of<GlobalData>(context).startTime;
     String endTime = ChangeNotifierProvider.of<GlobalData>(context).endTime;
     bool matchStart = ChangeNotifierProvider.of<GlobalData>(context).matchStart;
-    // TODO 暂时使用给定值，方便调试
-    // startTime = '2023-09-29 17:42:00';
-    // endTime = '2023-10-03 12:00:00';
     return Column(
       children: [
         const HomeTitle(),

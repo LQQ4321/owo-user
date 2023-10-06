@@ -42,16 +42,24 @@ class _GuidanceState extends State<Guidance> {
             Expanded(flex: 4, child: MoveWindow()),
             const SizedBox(width: 15),
             IconButton(
-                onPressed: () {
-                  MyDialogs.oneToast([
-                    'Refresh succeed',
-                    'The current page has fetched the latest data'
-                  ], duration: 5, infoStatus: 2);
-                  return;
-                  MyDialogs.oneToast([
-                    'Submit Succeed',
-                    'You may need to wait for a while to get the result'
-                  ]);
+                onPressed: () async {
+                  var cancel = MyDialogs.oneToast([
+                    'Updating',
+                    'The current page is fetching data'
+                  ], duration: 5, infoStatus: 0);
+                  bool flag = await ChangeNotifierProvider.of<GlobalData>(context).updateCurPageData();
+                  cancel();
+                  if(flag){
+                    MyDialogs.oneToast([
+                      'Update completed',
+                      'The current page has fetched the latest data'
+                    ], duration: 5, infoStatus: 0);
+                  }else{
+                    MyDialogs.oneToast([
+                      'Update failed',
+                      'There may be a network issue'
+                    ], duration: 5, infoStatus: 2);
+                  }
                 },
                 icon: const Icon(Icons.refresh)),
             const SizedBox(width: 15),

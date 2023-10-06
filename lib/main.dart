@@ -33,10 +33,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    // 程序启动到结束为止，这里应该只会运行一次吧，如果不止一次，就会导致程序运行过程中的数据丢失掉
+    // 程序启动到结束为止，这里应该只会运行一次吧，如果不止一次，就会导致之前程序运行过程中的数据丢失掉
     // 将总数据提取出来，方便访问成员
     GlobalData globalData = GlobalData();
     //调用获取主机用户名方法
+    //FIXME 有可能获取不到当前主机的用户名，从而导致下载路径错误
     globalData.config.setHostUserName();
     return ChangeNotifierProvider<GlobalData>(
         data: globalData,
@@ -49,6 +50,7 @@ class _MyAppState extends State<MyApp> {
                     child: ChangeNotifierProvider<UserModel>(
                       data: globalData.userModel,
                       child: MaterialApp(
+                          debugShowCheckedModeBanner: false,
                           builder: BotToastInit(),
                           navigatorObservers: [BotToastNavigatorObserver()],
                           home: const Scaffold(

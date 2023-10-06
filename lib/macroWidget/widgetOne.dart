@@ -230,7 +230,7 @@ class _RectangleInputState extends State<RectangleInput> {
         },
         child: Row(
           children: [
-            Padding(
+            Container(
               padding: const EdgeInsets.only(right: 10, left: 10),
               child: widget.icon,
             ),

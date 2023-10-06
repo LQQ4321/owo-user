@@ -17,8 +17,9 @@ class Config {
 
   late String netPath;
   late String hostUserName;
-  //如果不能得到用户名，应该让downloadFilePath为空，这样下载下来的文件应该是跟该程序在同一个目录下
-  late String downloadFilePath;
+  //如果不能得到用户名，应该让downloadFilePath为空，这样下载下来的文件应该是跟该程序在同一个目录下(等程序打包成exe后再验证)
+  //或者可以将文件默认存放在c盘下,不过这样做有点粗鲁
+  String downloadFilePath = 'C:\\';
 
   //根据给定的后缀，选择一个文件
   Future<FilePickerResult?> selectAFile(List<String> fileType) async {

@@ -9,14 +9,13 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Row(
+    return Row(
       children: List.generate(2, (index) {
         return index == 0
             ? const Expanded(flex: 1, child: LeftLogin())
             : Expanded(flex: 2, child: RightLogin());
       }),
-    ));
+    );
   }
 }
 
@@ -103,10 +102,10 @@ class RightLogin extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () async {
-                    //为了方便调试，这里先设置好
-                    _controllers[0].text = "2007310431";
-                    _controllers[1].text = "123456";
-                    _controllers[2].text = "175.178.57.154:5051#6";
+                    //TODO 为了方便调试，这里先设置好
+                    // _controllers[0].text = "2007310431";
+                    // _controllers[1].text = "123456";
+                    // _controllers[2].text = "175.178.57.154:5051#7";
                     //格式检查，保证没有输入框的是空的
                     for (int i = 0; i < _controllers.length; i++) {
                       if (_controllers[i].text.trim().isEmpty ||
@@ -115,7 +114,7 @@ class RightLogin extends StatelessWidget {
                                   _controllers[i].text.split('#')[0].isEmpty ||
                                   _controllers[i]
                                       .text
-                                      .split('#')[1]
+                                      .split('#')[1]//这里应该不会越界，因为只要包含有'#',最多也就是空字符串而已
                                       .isEmpty))) {
                         await MyDialogs.hintMessage(
                             context,
@@ -123,7 +122,7 @@ class RightLogin extends StatelessWidget {
                               'Format Error',
                               'Input information is empty or contest link error',
                             ],
-                            status: 1);
+                            status: 2);
                         return;
                       }
                     }
@@ -141,7 +140,7 @@ class RightLogin extends StatelessWidget {
                             'Login Fail',
                             'Username does not exist, incorrect match link, or incorrect password',
                           ],
-                          status: 1);
+                          status: 2);
                     }
                   },
                   style: ButtonStyle(

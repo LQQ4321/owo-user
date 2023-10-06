@@ -40,11 +40,12 @@ class NewsModel extends ChangeNotifier {
     latestRequestTime = null;
     latestSendTime = null;
     textEditingController.clear();
-    //需要调用这个方法吗
-    textEditingController.notifyListeners();
+    //需要调用这个方法吗,好像不需要，clear就可以清除输入框文本了
+    // textEditingController.notifyListeners();
     newsList.clear();
-    //  这里需要调用notifyListeners()吗
-    //   notifyListeners();
+    // 这里应该是需要调用notifyListeners()的，因为在GlobalData那里调用notifyListeners()，
+    // 有些只监听了自己的数据变化，没有监听总的数据
+      notifyListeners();
   }
 
   void localAddNewMessage() {

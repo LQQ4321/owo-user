@@ -39,8 +39,6 @@ class _BodyState extends State<Body> {
             } else if (curButId == 4) {
               return const Rank();
             }
-            // String curProblemId = ChangeNotifierProvider.of<GlobalData>(context).problemModel.curProblem.toString();
-            // debugPrint(curProblemId);
             return Container(
               color: Colors.grey[300],
             );
