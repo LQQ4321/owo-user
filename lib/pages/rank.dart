@@ -108,7 +108,7 @@ class _RankState extends State<Rank> {
                                           ? 0
                                           : 1), (rowIndex) {
                         int start = rowIndex * _maxRows;
-                        int end = min((start + 1) * _maxRows, userList.length);
+                        int end = min((start + 1) * _maxRows, problemList.length);
                         return Expanded(
                             child: _ProblemStatus(
                                 problemStatus: userList[index]

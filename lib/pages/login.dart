@@ -103,9 +103,9 @@ class RightLogin extends StatelessWidget {
               ElevatedButton(
                   onPressed: () async {
                     //TODO 为了方便调试，这里先设置好
-                    // _controllers[0].text = "2007310431";
-                    // _controllers[1].text = "123456";
-                    // _controllers[2].text = "175.178.57.154:5051#7";
+                    _controllers[0].text = "2007310431";
+                    _controllers[1].text = "123456";
+                    _controllers[2].text = "175.178.57.154:5051#7";
                     //格式检查，保证没有输入框的是空的
                     for (int i = 0; i < _controllers.length; i++) {
                       if (_controllers[i].text.trim().isEmpty ||
