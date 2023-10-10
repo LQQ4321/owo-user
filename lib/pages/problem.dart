@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:owo_user/data/dataOne.dart';
 import 'package:owo_user/data/dataTwo.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
 import 'package:owo_user/macroWidget/widgetOne.dart';
+import 'package:pdfx/pdfx.dart';
 
 class ProblemBody extends StatelessWidget {
   const ProblemBody({Key? key}) : super(key: key);
@@ -12,18 +14,32 @@ class ProblemBody extends StatelessWidget {
   Widget build(BuildContext context) {
     int problemNumber =
         ChangeNotifierProvider.of<ProblemModel>(context).problemList.length;
+    int curProblem =
+        ChangeNotifierProvider.of<ProblemModel>(context).curProblem;
+    String curPdfFilePath = ChangeNotifierProvider.of<ProblemModel>(context)
+        .problemList[curProblem]
+        .pdfFileName;
     return problemNumber > 0
         ? Container(
-            color: Colors.grey[100],
+            color: Colors.white,
             child: Row(
               children: [
                 const _QuestionList(),
                 Expanded(
-                    child: Column(
-                  children: const [
-                    Expanded(child: _ProblemInfo()),
-                  ],
-                ))
+                    child: Container(
+                  color: Colors.grey[100],
+                  child: MyPdfViewer(pdfFilePath: curPdfFilePath),
+                )),
+                Container(
+                  width: 300,
+                  color: Colors.lightBlueAccent,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: 'hello world !'));
+                    },
+                    child: Text('copy'),
+                  ),
+                )
               ],
             ))
         : Container(
@@ -52,15 +68,16 @@ class _QuestionList extends StatelessWidget {
         ChangeNotifierProvider.of<ProblemModel>(context);
     return Container(
         width: 75,
-        margin: const EdgeInsets.only(left: 60, top: 30, bottom: 30),
+        height: 600,
+        margin: const EdgeInsets.only(left: 60),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
             boxShadow: const [
               BoxShadow(
-                  color: Colors.black12,
+                  color: Colors.black54,
                   offset: Offset(1.0, 1.0),
-                  blurRadius: 2.0)
+                  blurRadius: 1.0)
             ]),
         child: ListView.builder(
             itemCount: inProblemModel.problemList.length,
@@ -91,6 +108,95 @@ class _QuestionList extends StatelessWidget {
   }
 }
 
+class MyPdfViewer extends StatefulWidget {
+  const MyPdfViewer({Key? key, required this.pdfFilePath}) : super(key: key);
+  final String pdfFilePath;
+
+  @override
+  State<MyPdfViewer> createState() => _MyPdfViewerState();
+}
+
+class _MyPdfViewerState extends State<MyPdfViewer> {
+  static const int _initialPage = 1;
+  late PdfController _pdfController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pdfController = PdfController(
+      document: PdfDocument.openFile(widget.pdfFilePath),
+      initialPage: _initialPage,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pdfController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        PdfView(
+          controller: _pdfController,
+          renderer: (PdfPage page) => page.render(
+              width: page.width * 2,
+              height: page.height * 2,
+              format: PdfPageImageFormat.jpeg,
+              backgroundColor: '#FFFFFF'),
+        ),
+        Align(
+            alignment: Alignment.topRight,
+            child: SizedBox(
+              width: 100,
+              height: 200,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 40,
+                    width: 100,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(2, (index) {
+                          return ElevatedButton(
+                              style: ButtonStyle(
+                                  minimumSize: MaterialStateProperty.all(
+                                      const Size(40, 40))),
+                              onPressed: () {
+                                if (index == 0) {
+                                  _pdfController.previousPage(
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.ease);
+                                } else {
+                                  _pdfController.nextPage(
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.ease);
+                                }
+                              },
+                              child: Text(index == 0 ? '<' : '>'));
+                        })),
+                  ),
+                  PdfPageNumber(
+                    controller: _pdfController,
+                    builder: (_, loadingState, page, pagesCount) => Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$page/${pagesCount ?? 0}',
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )),
+      ],
+    );
+  }
+}
+
 class _ProblemInfo extends StatelessWidget {
   const _ProblemInfo({Key? key}) : super(key: key);
 
@@ -98,238 +204,232 @@ class _ProblemInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     ProblemModel problemModel =
         ChangeNotifierProvider.of<ProblemModel>(context);
-    int curProblemId =
-        ChangeNotifierProvider.of<ProblemModel>(context).curProblem;
+    int curProblemId = ChangeNotifierProvider.of<ProblemModel>(context)
+        .curProblem; //unknown platforms
     return Container(
-            width: double.infinity,
-            height: double.infinity,
-            margin:
-                const EdgeInsets.only(left: 40, right: 60, top: 30, bottom: 30),
-            // padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(2),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Colors.black12,
-                      offset: Offset(1.0, 1.0),
-                      blurRadius: 2.0)
-                ]),
-            child: Column(
+        width: double.infinity,
+        height: double.infinity,
+        margin: const EdgeInsets.only(left: 40, right: 60, top: 30, bottom: 30),
+        // padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(1.0, 1.0),
+                  blurRadius: 2.0)
+            ]),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                        height: 60,
-                        width: 100,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            MyDialogs.processingBar(context, 'downloading');
-                            bool flag =
-                                await ChangeNotifierProvider.of<GlobalData>(
-                                        context)
-                                    .downloadProblemFile();
-                            //不管怎么样，这一行代码都要执行
-                            Navigator.pop(context);
-                            if (flag) {
-                              MyDialogs.oneToast(['Download file succeed', ''],
-                                  infoStatus: 2);
-                            } else {
-                              MyDialogs.oneToast(['Download file fail', ''],
-                                  infoStatus: 1);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(0)),
-                              side: BorderSide.none,
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.grey),
-                          child: const Icon(
-                            Icons.download,
-                            color: Colors.grey,
-                          ),
-                        )),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          problemModel.problemList[curProblemId].problemName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                SizedBox(
+                    height: 60,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        MyDialogs.processingBar(context, 'downloading');
+                        bool flag =
+                            await ChangeNotifierProvider.of<GlobalData>(context)
+                                .downloadProblemFile();
+                        //不管怎么样，这一行代码都要执行
+                        Navigator.pop(context);
+                        if (flag) {
+                          MyDialogs.oneToast(['Download file succeed', ''],
+                              infoStatus: 2);
+                        } else {
+                          MyDialogs.oneToast(['Download file fail', ''],
+                              infoStatus: 1);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0)),
+                          side: BorderSide.none,
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.grey),
+                      child: const Icon(
+                        Icons.download,
+                        color: Colors.grey,
+                      ),
+                    )),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      problemModel.problemList[curProblemId].problemName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(
-                      height: 60,
-                      width: 100,
-                    ),
-                  ],
-                ),
-                Container(height: 1, color: Colors.grey),
-                Row(
-                  children: [
-                    Expanded(
-                        child: Column(
-                      children: [
-                        _SrcLimit(
-                            iconText: 'T',
-                            limitText:
-                                '${problemModel.problemList[curProblemId].timeLimit} ms'),
-                        _SrcLimit(
-                            iconText: 'M',
-                            limitText:
-                                '${problemModel.problemList[curProblemId].memoryLimit} mb'),
-                      ],
-                    )),
-                    // Container(height: 150, width: 1, color: Colors.grey),
-                    Expanded(
-                        child: Column(
-                      children: [
-                        Center(
-                          child: RatioBar(
-                              numerator: int.parse(problemModel
-                                  .problemList[curProblemId].submitAc),
-                              denominator: int.parse(problemModel
-                                  .problemList[curProblemId].submitTotal)),
-                        ),
-                        const SizedBox(height: 50),
-                        ElevatedButton(
-                            onPressed: () async {
-                              int submitStatus =
-                                  await ChangeNotifierProvider.of<GlobalData>(
-                                          context)
-                                      .submitCodeFile();
-                              if (submitStatus == 0) {
-                                MyDialogs.oneToast(['submit succeed', ''],
-                                    infoStatus: 2);
-                              } else if (submitStatus == 2) {
-                                MyDialogs.oneToast(['file is too large', ''],
-                                    infoStatus: 1);
-                              } else if (submitStatus == 3) {
-                                MyDialogs.oneToast(['file type error', ''],
-                                    infoStatus: 1);
-                              } else if (submitStatus == 4) {
-                                MyDialogs.oneToast(['submit fail', ''],
-                                    infoStatus: 1);
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(double.infinity, 60),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(0)),
-                                side: BorderSide.none,
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.grey),
-                            child: const Text(
-                              'submit',
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500),
-                            )),
-                        const SizedBox(height: 30),
-                      ],
-                    )),
-                  ],
-                ),
-                Container(height: 20),
-                Container(
-                  height: 30,
-                  color: Colors.grey[100],
-                  child: Row(
-                    children: List.generate(3, (index) {
-                      List<String> list = [
-                        'Example Id',
-                        'In File Download',
-                        'Out File DownLoad'
-                      ];
-                      return Expanded(
-                          child: Center(
-                              child: Text(
-                        list[index],
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16),
-                      )));
-                    }),
                   ),
                 ),
-                Expanded(
-                    child: problemModel
-                            .problemList[curProblemId].exampleFileList.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'Not exists example file',
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w300),
-                            ),
-                          )
-                        : ListView.separated(
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return Container(
-                                  height: 1, color: Colors.grey[300]);
-                            },
-                            itemCount: problemModel.problemList[curProblemId]
-                                .exampleFileList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return SizedBox(
-                                height: 50,
-                                child: Row(
-                                  children: List.generate(3, (rowIndex) {
-                                    return Expanded(
-                                        child: Center(
-                                            child: TextButton(
-                                                onPressed: () async {
-                                                  if (rowIndex == 0) {
-                                                    return;
-                                                  }
-                                                  MyDialogs.processingBar(
-                                                      context, 'downloading');
-                                                  bool flag =
-                                                      await ChangeNotifierProvider
-                                                              .of<GlobalData>(
-                                                                  context)
-                                                          .downloadExampleFile(
-                                                              index, rowIndex);
-                                                  Navigator.pop(context);
-                                                  if (flag) {
-                                                    MyDialogs.oneToast([
-                                                      'download file succeed',
-                                                      ''
-                                                    ], infoStatus: 2);
-                                                  } else {
-                                                    MyDialogs.oneToast([
-                                                      'download file fail',
-                                                      ''
-                                                    ], infoStatus: 1);
-                                                  }
-                                                },
-                                                child: Text(
-                                                  rowIndex == 0
-                                                      ? '#${index + 1}'
-                                                      : '${String.fromCharCode(65 + curProblemId)}_${rowIndex == 1 ? 'in' : 'out'}${index + 1}',
-                                                  style: const TextStyle(
-                                                      color: Colors.black54,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 16),
-                                                ))));
-                                  }),
-                                ),
-                              );
-                            })),
+                const SizedBox(
+                  height: 60,
+                  width: 100,
+                ),
               ],
-            ));
+            ),
+            Container(height: 1, color: Colors.grey),
+            Row(
+              children: [
+                Expanded(
+                    child: Column(
+                  children: [
+                    _SrcLimit(
+                        iconText: 'T',
+                        limitText:
+                            '${problemModel.problemList[curProblemId].timeLimit} ms'),
+                    _SrcLimit(
+                        iconText: 'M',
+                        limitText:
+                            '${problemModel.problemList[curProblemId].memoryLimit} mb'),
+                  ],
+                )),
+                // Container(height: 150, width: 1, color: Colors.grey),
+                Expanded(
+                    child: Column(
+                  children: [
+                    Center(
+                      child: RatioBar(
+                          numerator: int.parse(
+                              problemModel.problemList[curProblemId].submitAc),
+                          denominator: int.parse(problemModel
+                              .problemList[curProblemId].submitTotal)),
+                    ),
+                    const SizedBox(height: 50),
+                    ElevatedButton(
+                        onPressed: () async {
+                          int submitStatus =
+                              await ChangeNotifierProvider.of<GlobalData>(
+                                      context)
+                                  .submitCodeFile();
+                          if (submitStatus == 0) {
+                            MyDialogs.oneToast(['submit succeed', ''],
+                                infoStatus: 2);
+                          } else if (submitStatus == 2) {
+                            MyDialogs.oneToast(['file is too large', ''],
+                                infoStatus: 1);
+                          } else if (submitStatus == 3) {
+                            MyDialogs.oneToast(['file type error', ''],
+                                infoStatus: 1);
+                          } else if (submitStatus == 4) {
+                            MyDialogs.oneToast(['submit fail', ''],
+                                infoStatus: 1);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 60),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0)),
+                            side: BorderSide.none,
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.grey),
+                        child: const Text(
+                          'submit',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        )),
+                    const SizedBox(height: 30),
+                  ],
+                )),
+              ],
+            ),
+            Container(height: 20),
+            Container(
+              height: 30,
+              color: Colors.grey[100],
+              child: Row(
+                children: List.generate(3, (index) {
+                  List<String> list = [
+                    'Example Id',
+                    'In File Download',
+                    'Out File DownLoad'
+                  ];
+                  return Expanded(
+                      child: Center(
+                          child: Text(
+                    list[index],
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16),
+                  )));
+                }),
+              ),
+            ),
+            Expanded(
+                child: problemModel
+                        .problemList[curProblemId].exampleFileList.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'Not exists example file',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w300),
+                        ),
+                      )
+                    : ListView.separated(
+                        separatorBuilder: (BuildContext context, int index) {
+                          return Container(height: 1, color: Colors.grey[300]);
+                        },
+                        itemCount: problemModel
+                            .problemList[curProblemId].exampleFileList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return SizedBox(
+                            height: 50,
+                            child: Row(
+                              children: List.generate(3, (rowIndex) {
+                                return Expanded(
+                                    child: Center(
+                                        child: TextButton(
+                                            onPressed: () async {
+                                              if (rowIndex == 0) {
+                                                return;
+                                              }
+                                              MyDialogs.processingBar(
+                                                  context, 'downloading');
+                                              bool flag =
+                                                  await ChangeNotifierProvider
+                                                          .of<GlobalData>(
+                                                              context)
+                                                      .downloadExampleFile(
+                                                          index, rowIndex);
+                                              Navigator.pop(context);
+                                              if (flag) {
+                                                MyDialogs.oneToast([
+                                                  'download file succeed',
+                                                  ''
+                                                ], infoStatus: 2);
+                                              } else {
+                                                MyDialogs.oneToast(
+                                                    ['download file fail', ''],
+                                                    infoStatus: 1);
+                                              }
+                                            },
+                                            child: Text(
+                                              rowIndex == 0
+                                                  ? '#${index + 1}'
+                                                  : '${String.fromCharCode(65 + curProblemId)}_${rowIndex == 1 ? 'in' : 'out'}${index + 1}',
+                                              style: const TextStyle(
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 16),
+                                            ))));
+                              }),
+                            ),
+                          );
+                        })),
+          ],
+        ));
   }
 }
 

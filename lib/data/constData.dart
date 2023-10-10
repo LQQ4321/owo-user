@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 class ConstantData {
 
+  static const String chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
   static List<String> statusType = [
     "FirstAc",
     "Accepted",

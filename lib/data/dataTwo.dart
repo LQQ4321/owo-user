@@ -4,14 +4,16 @@ import 'package:owo_user/data/myConfig.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
-
 import 'package:owo_user/macroWidget/funcOne.dart';
+import 'package:pdfx/pdfx.dart';
 
 //这里应该不用继承ChangeNotifier吧，如果是在该类里面调用notifyListeners方法才有必要继承
 class ExampleFile {
   late String exampleId;
   late String inFilePath;
   late String outFilePath;
+  String inText = '';
+  String outText = '';
 
   ExampleFile(
       {required this.exampleId,
@@ -35,6 +37,12 @@ class Problem {
   late String problemName;
   bool isAc = false; //当前用户是否通过该题目
   late bool pdf;
+
+  //pdf文件名，不可能每次打开题目都重新下载一遍文件，所以可以第一次打开题目的时候就将其下载下来，这样下载一次就可以了，
+  //如果文件该题的pdf文件为空，那么表示还没有下载，为了防止重覆盖同名文件，这里的文件名应该是随机生成的，
+  //每次保存文件的时候还应该检查是否存在同名文件，如果存在，就重新生成一个文件名
+  //PdfDocument.openFile(r'C:\Users\QQ123456\Downloads\problemxiaobai.pdf'),
+  String pdfFileName = '';
   late String timeLimit;
   late String memoryLimit;
   late String maxFileLimit;
@@ -73,7 +81,7 @@ class Problem {
 //应该尽量自己处理属于自己的数据
 class ProblemModel extends ChangeNotifier {
   //先初始化好
-  List<Problem> problemList = List.generate(0, (index) => Problem());
+  List<Problem> problemList = [];
 
 //当前浏览的是哪一道题目，因为这里的默认下标是0
   int curProblem = 0;
@@ -82,9 +90,10 @@ class ProblemModel extends ChangeNotifier {
   static const int requestGap = 60 * 5;
   DateTime? latestRequestTime;
 
-  void cleanCacheData(){
+  void cleanCacheData() {
     latestRequestTime = null;
     problemList.clear();
+    curProblem = 0;
     notifyListeners();
   }
 
@@ -119,36 +128,46 @@ class ProblemModel extends ChangeNotifier {
       'requestType': 'requestProblemsInfo',
       'info': [contestId]
     };
-    return await Config.dio
+    bool flag = false;
+    flag = await Config.dio
         .post(config.netPath + Config.jsonRequest, data: request)
         .then((value) {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
       }
-      // debugPrint(value.data['problems'].toString());
       List problems = value.data['problems'] as List;
       problemList = List.generate(problems.length, (index) {
         return Problem.fromJson(problems[index]);
       });
-      notifyListeners();
-      // debugPrint(problemList.length.toString());
-      // debugPrint(problemList.toString());
       return true;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       return false;
     });
+    if (!flag) {
+      return false;
+    }
+    //  因为打开problem页面默认显示的是第一道题，所以这里要把题目描述文件下载好
+    flag = await downloadProblemFile(config, contestId);
+    if (flag) {
+      notifyListeners();
+    }
+    return flag;
   }
 
 // 下载题目描述文件
   Future<bool> downloadProblemFile(Config config, String contestId) async {
-    //先构建文件名
-    String filePath =
-        '${String.fromCharCode(65 + curProblem)}_problem$contestId.pdf';
-    //如果能够找到准备要下载的文件,那打开其所在文件夹即可
-    if (await config.isExistFile(config.downloadFilePath, filePath)) {
-      config.openFolder(config.downloadFilePath);
+    if (problemList[curProblem].pdfFileName.isNotEmpty) {
       return true;
+    }
+    while (true) {
+      String fileName = '${FuncOne.generateRandomString(10)}.pdf';
+      //如果文件名已存在,就重新生成一个文件名
+      if (!await config.isExistFile(
+          config.downloadFilePath, fileName)) {
+        problemList[curProblem].pdfFileName = config.downloadFilePath + fileName;
+        break;
+      }
     }
     Map request = {
       'requestType': 'downloadPdfFile',
@@ -160,15 +179,13 @@ class ProblemModel extends ChangeNotifier {
           config.netPath + Config.jsonRequest,
           data: request,
           options: Options(responseType: ResponseType.bytes));
-      File file = File(config.downloadFilePath + filePath);
+      File file =
+          File(problemList[curProblem].pdfFileName);
       await file.writeAsBytes(response.data);
       flag = true;
+      notifyListeners();
     } catch (e) {
       debugPrint(e.toString());
-    }
-    if (flag) {
-      //如果把文件名也加上去的话，那就是直接打开文件了
-      config.openFolder(config.downloadFilePath);
     }
     return flag;
   }
@@ -176,14 +193,12 @@ class ProblemModel extends ChangeNotifier {
 //  下载样例文件
   Future<bool> downloadExampleFile(
       Config config, String contestId, int columnIndex, int rowIndex) async {
-    //先构建文件名
-    String fileName =
-        '${String.fromCharCode(65 + curProblem)}_${rowIndex == 1 ? 'in' : 'out'}${columnIndex + 1}.txt';
-    if (await config.isExistFile(config.downloadFilePath, fileName)) {
-      config.openFolder(config.downloadFilePath);
+    //将样例存放在内存中，因此不太适合存放数据量太大的样例
+    if(rowIndex == 1 && problemList[curProblem].exampleFileList[columnIndex].inText.isNotEmpty){
+      return true;
+    }else if(rowIndex == 2 && problemList[curProblem].exampleFileList[columnIndex].outText.isNotEmpty){
       return true;
     }
-    debugPrint(fileName);
     String filePath =
         problemList[curProblem].exampleFileList[columnIndex].inFilePath;
     if (rowIndex == 2) {
@@ -195,16 +210,19 @@ class ProblemModel extends ChangeNotifier {
       'requestType': 'downloadExampleFile',
       'info': [filePath]
     };
-    // bool flag = false;
     return await Config.dio
         .post(config.netPath + Config.jsonRequest, data: request)
         .then((value) async {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
       }
-      final file = File(config.downloadFilePath + fileName);
-      await file.writeAsString(value.data['exampleFile']);
-      config.openFolder(config.downloadFilePath);
+      if(rowIndex == 1){
+        // FIXME 因为现在上传的样例文件都是只有一行而已，所以换行符的问题可能存在
+        problemList[curProblem].exampleFileList[columnIndex].inText = value.data['exampleFile'];
+      }else{
+        problemList[curProblem].exampleFileList[columnIndex].outText = value.data['exampleFile'];
+      }
+      notifyListeners();
       return true;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
