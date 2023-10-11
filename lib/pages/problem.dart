@@ -16,10 +16,7 @@ class ProblemBody extends StatelessWidget {
         ChangeNotifierProvider.of<ProblemModel>(context).problemList.length;
     int curProblem =
         ChangeNotifierProvider.of<ProblemModel>(context).curProblem;
-    String curPdfFilePath = ChangeNotifierProvider.of<ProblemModel>(context)
-        .problemList[curProblem]
-        .pdfFileName;
-    return problemNumber > 0
+    return problemNumber > 0 && curProblem >= 0
         ? Container(
             color: Colors.white,
             child: Row(
@@ -27,9 +24,12 @@ class ProblemBody extends StatelessWidget {
                 const _QuestionList(),
                 Expanded(
                     child: Container(
-                  color: Colors.grey[100],
-                  child: MyPdfViewer(pdfFilePath: curPdfFilePath),
-                )),
+                        color: Colors.grey[100],
+                        child: Builder(
+                          builder: (BuildContext context) {
+                            return const MyPdfViewer();
+                          },
+                        ))),
                 Container(
                   width: 300,
                   color: Colors.lightBlueAccent,
@@ -89,7 +89,7 @@ class _QuestionList extends StatelessWidget {
                     : Colors.transparent,
                 child: TextButton(
                     onPressed: () {
-                      inProblemModel.switchProblem(index);
+                      ChangeNotifierProvider.of<ProblemModel>(context).switchProblem(index);
                     },
                     style: ButtonStyle(
                         minimumSize:
@@ -108,35 +108,16 @@ class _QuestionList extends StatelessWidget {
   }
 }
 
-class MyPdfViewer extends StatefulWidget {
-  const MyPdfViewer({Key? key, required this.pdfFilePath}) : super(key: key);
-  final String pdfFilePath;
-
-  @override
-  State<MyPdfViewer> createState() => _MyPdfViewerState();
-}
-
-class _MyPdfViewerState extends State<MyPdfViewer> {
-  static const int _initialPage = 1;
-  late PdfController _pdfController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pdfController = PdfController(
-      document: PdfDocument.openFile(widget.pdfFilePath),
-      initialPage: _initialPage,
-    );
-  }
-
-  @override
-  void dispose() {
-    _pdfController.dispose();
-    super.dispose();
-  }
+// class MyPdfViewer extends StatefulWidget {
+class MyPdfViewer extends StatelessWidget {
+  const MyPdfViewer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final PdfController _pdfController = ChangeNotifierProvider.of<ProblemModel>(context).pdfController;
+    // debugPrint(_pdfController.document)
+    // debugPrint(_pdfController.document.toString());
+    // debugPrint("pdf viewer");
     return Stack(
       children: [
         PdfView(
@@ -230,19 +211,19 @@ class _ProblemInfo extends StatelessWidget {
                     width: 100,
                     child: ElevatedButton(
                       onPressed: () async {
-                        MyDialogs.processingBar(context, 'downloading');
-                        bool flag =
-                            await ChangeNotifierProvider.of<GlobalData>(context)
-                                .downloadProblemFile();
+                        // MyDialogs.processingBar(context, 'downloading');
+                        // bool flag =
+                        // await ChangeNotifierProvider.of<GlobalData>(context)
+                        //     .downloadProblemFile();
                         //不管怎么样，这一行代码都要执行
-                        Navigator.pop(context);
-                        if (flag) {
-                          MyDialogs.oneToast(['Download file succeed', ''],
-                              infoStatus: 2);
-                        } else {
-                          MyDialogs.oneToast(['Download file fail', ''],
-                              infoStatus: 1);
-                        }
+                        // Navigator.pop(context);
+                        // if (flag) {
+                        //   MyDialogs.oneToast(['Download file succeed', ''],
+                        //       infoStatus: 2);
+                        // } else {
+                        //   MyDialogs.oneToast(['Download file fail', ''],
+                        //       infoStatus: 1);
+                        // }
                       },
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -392,28 +373,28 @@ class _ProblemInfo extends StatelessWidget {
                                     child: Center(
                                         child: TextButton(
                                             onPressed: () async {
-                                              if (rowIndex == 0) {
-                                                return;
-                                              }
-                                              MyDialogs.processingBar(
-                                                  context, 'downloading');
-                                              bool flag =
-                                                  await ChangeNotifierProvider
-                                                          .of<GlobalData>(
-                                                              context)
-                                                      .downloadExampleFile(
-                                                          index, rowIndex);
-                                              Navigator.pop(context);
-                                              if (flag) {
-                                                MyDialogs.oneToast([
-                                                  'download file succeed',
-                                                  ''
-                                                ], infoStatus: 2);
-                                              } else {
-                                                MyDialogs.oneToast(
-                                                    ['download file fail', ''],
-                                                    infoStatus: 1);
-                                              }
+                                              // if (rowIndex == 0) {
+                                              //   return;
+                                              // }
+                                              // MyDialogs.processingBar(
+                                              //     context, 'downloading');
+                                              // bool flag =
+                                              //     await ChangeNotifierProvider
+                                              //             .of<GlobalData>(
+                                              //                 context)
+                                              //         .downloadExampleFile(
+                                              //             index, rowIndex);
+                                              // Navigator.pop(context);
+                                              // if (flag) {
+                                              //   MyDialogs.oneToast([
+                                              //     'download file succeed',
+                                              //     ''
+                                              //   ], infoStatus: 2);
+                                              // } else {
+                                              //   MyDialogs.oneToast(
+                                              //       ['download file fail', ''],
+                                              //       infoStatus: 1);
+                                              // }
                                             },
                                             child: Text(
                                               rowIndex == 0

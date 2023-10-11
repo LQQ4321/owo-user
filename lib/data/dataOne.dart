@@ -99,16 +99,22 @@ class GlobalData extends ChangeNotifier {
     return await problemModel.requestProblemData(config, contestId);
   }
 
+  //切换当前题目
+  // void switchProblem(int id) async {
+  //   await problemModel.switchProblem(id, config, contestId);
+  //   notifyListeners();
+  // }
+
   //下载题目文件
-  Future<bool> downloadProblemFile() async {
-    return await problemModel.downloadProblemFile(config, contestId);
-  }
+  // Future<bool> downloadProblemFile() async {
+  //   return await problemModel.downloadProblemFile(config, contestId);
+  // }
 
 //  下载样例文件
-  Future<bool> downloadExampleFile(int columnIndex, int rowIndex) async {
-    return await problemModel.downloadExampleFile(
-        config, contestId, columnIndex, rowIndex);
-  }
+//   Future<bool> downloadExampleFile(int columnIndex, int rowIndex) async {
+//     return await problemModel.downloadExampleFile(
+//         config, contestId, columnIndex, rowIndex);
+//   }
 
 //  提交代码文件
   Future<int> submitCodeFile() async {

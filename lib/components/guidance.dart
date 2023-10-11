@@ -43,22 +43,22 @@ class _GuidanceState extends State<Guidance> {
             const SizedBox(width: 15),
             IconButton(
                 onPressed: () async {
-                  var cancel = MyDialogs.oneToast([
-                    'Updating',
-                    'The current page is fetching data'
-                  ], duration: 5, infoStatus: 0);
-                  bool flag = await ChangeNotifierProvider.of<GlobalData>(context).updateCurPageData();
+                  var cancel = MyDialogs.oneToast(
+                      ['Updating', 'The current page is fetching data'],
+                      duration: 5, infoStatus: 0);
+                  bool flag =
+                      await ChangeNotifierProvider.of<GlobalData>(context)
+                          .updateCurPageData();
                   cancel();
-                  if(flag){
+                  if (flag) {
                     MyDialogs.oneToast([
                       'Update completed',
                       'The current page has fetched the latest data'
                     ], duration: 5, infoStatus: 0);
-                  }else{
-                    MyDialogs.oneToast([
-                      'Update failed',
-                      'There may be a network issue'
-                    ], duration: 5, infoStatus: 2);
+                  } else {
+                    MyDialogs.oneToast(
+                        ['Update failed', 'There may be a network issue'],
+                        duration: 5, infoStatus: 2);
                   }
                 },
                 icon: const Icon(Icons.refresh)),
@@ -113,7 +113,8 @@ class MidRoutes extends StatelessWidget {
               await ChangeNotifierProvider.of<GlobalData>(context)
                   .requestNewsData();
             } else if (index == 4) {
-              await ChangeNotifierProvider.of<GlobalData>(context).requestRankData();
+              await ChangeNotifierProvider.of<GlobalData>(context)
+                  .requestRankData();
             }
           },
           child: Text(

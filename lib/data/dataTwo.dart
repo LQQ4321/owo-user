@@ -12,6 +12,7 @@ class ExampleFile {
   late String exampleId;
   late String inFilePath;
   late String outFilePath;
+  //将样例存放在内存中
   String inText = '';
   String outText = '';
 
@@ -46,6 +47,8 @@ class Problem {
   late String timeLimit;
   late String memoryLimit;
   late String maxFileLimit;
+  //是否已经下载样例文件
+  bool isDownloadExampleFile = false;
   List<ExampleFile> exampleFileList = [];
   late String submitTotal;
   late String submitAc;
@@ -82,10 +85,14 @@ class Problem {
 class ProblemModel extends ChangeNotifier {
   //先初始化好
   List<Problem> problemList = [];
-
+  late Config config;
+  late String contestId;
 //当前浏览的是哪一道题目，因为这里的默认下标是0
-  int curProblem = 0;
-
+  int curProblem = -1;
+  PdfController pdfController = PdfController(
+    document:
+        PdfDocument.openFile(r'C:\Users\QQ123456\Downloads\problemxiaobai.pdf'),
+  );
   //上一次的请求时间跟这一次的请求时间至少要距离requestGap
   static const int requestGap = 60 * 5;
   DateTime? latestRequestTime;
@@ -97,28 +104,64 @@ class ProblemModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void switchProblem(int id) {
+  void switchProblem(int id) async {
+    debugPrint(id.toString());
     if (curProblem != id) {
-      curProblem = id;
-      //虽然在这里notifyListeners了，但是并没有ChangeNotifierProvider<ProblemModel>在监听，
-      //就会导致数据其实已经改变了，但是没有及时渲染到界面上。
-      //即使调用ChangeNotifierProvider.of<GlobalData>(context).problemModel.switchProblem(index);
-      //也是无法更新数据的，因为这里的notifyListeners是传给ProblemModel的，GlobalData并没有收到该通知事件。
-      //  还有一个点可以证明上面的猜想是正确的:
-      //  通过ChangeNotifierProvider.of<GlobalData>(context).problemModel;来获取problemModel
-      //  和通过ChangeNotifierProvider.of<ProblemModel>(context);来获取problemModel是不一样的
-      //  前者调用switchProblem方法，数据没有及时渲染;后者调用，数据及时渲染到界面上了，
-      //  证明前者标记了一处GlobalData监听，监听不到这里发送出去的ProblemModel类型的notifyListeners，
-      //  后者标记了一处ProblemModel监听，可以监听到ProblemModel类型的notifyListeners
-      //这里有两者方法解决 :
-      //1.将notifyListeners放到Global类里面，这样ChangeNotifierProvider<GlobalData>就可以及时的监听到数据改变了
-      //2.创建一个监听ProblemModel的ChangeNotifierProvider<ProblemModel>，这样就可以监听到了
+      if (problemList.isNotEmpty) {
+        curProblem = id;
+        if (await downloadProblemFile(config, contestId)) {
+          pdfController.loadDocument(
+              PdfDocument.openFile(problemList[curProblem].pdfFileName));
+          notifyListeners();
+        }
+
+        if (!problemList[curProblem].isDownloadExampleFile) {
+          List<Future> funcList = [];
+          for (int i = 0;
+              i < problemList[curProblem].exampleFileList.length;
+              i++) {
+            funcList.add(downloadExampleFile(config, contestId, i, 1));
+            funcList.add(downloadExampleFile(config, contestId, i, 2));
+          }
+          Future.wait(funcList).then((value) {
+            bool flag = true;
+            //只要有一个样例文件下载失败，就认定为下载失败
+            for (int i = 0; i < value.length; i++) {
+              if ((value[i] is bool) && (!value[i])) {
+                flag = false;
+                break;
+              }
+            }
+            if (flag) {
+              problemList[curProblem].isDownloadExampleFile = true;
+              debugPrint("example file get succeed");
+            }
+          }).catchError((onError) {
+            debugPrint(onError.toString());
+          });
+        }
+      }
       notifyListeners();
     }
+    //虽然在这里notifyListeners了，但是并没有ChangeNotifierProvider<ProblemModel>在监听，
+    //就会导致数据其实已经改变了，但是没有及时渲染到界面上。
+    //即使调用ChangeNotifierProvider.of<GlobalData>(context).problemModel.switchProblem(index);
+    //也是无法更新数据的，因为这里的notifyListeners是传给ProblemModel的，GlobalData并没有收到该通知事件。
+    //  还有一个点可以证明上面的猜想是正确的:
+    //  通过ChangeNotifierProvider.of<GlobalData>(context).problemModel;来获取problemModel
+    //  和通过ChangeNotifierProvider.of<ProblemModel>(context);来获取problemModel是不一样的
+    //  前者调用switchProblem方法，数据没有及时渲染;后者调用，数据及时渲染到界面上了，
+    //  证明前者标记了一处GlobalData监听，监听不到这里发送出去的ProblemModel类型的notifyListeners，
+    //  后者标记了一处ProblemModel监听，可以监听到ProblemModel类型的notifyListeners
+    //这里有两者方法解决 :
+    //1.将notifyListeners放到Global类里面，这样ChangeNotifierProvider<GlobalData>就可以及时的监听到数据改变了
+    //2.创建一个监听ProblemModel的ChangeNotifierProvider<ProblemModel>，这样就可以监听到了
   }
 
   //请求题目数据
   Future<bool> requestProblemData(Config config, String contestId) async {
+    this.config = config;
+    this.contestId = contestId;
     if (latestRequestTime != null &&
         DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
       return true;
@@ -139,6 +182,7 @@ class ProblemModel extends ChangeNotifier {
       problemList = List.generate(problems.length, (index) {
         return Problem.fromJson(problems[index]);
       });
+      notifyListeners();
       return true;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
@@ -147,12 +191,28 @@ class ProblemModel extends ChangeNotifier {
     if (!flag) {
       return false;
     }
-    //  因为打开problem页面默认显示的是第一道题，所以这里要把题目描述文件下载好
-    flag = await downloadProblemFile(config, contestId);
-    if (flag) {
-      notifyListeners();
+    if (problemList.isEmpty) {
+      return true;
     }
+    switchProblem(0);
     return flag;
+    // return await Config.dio
+    //     .post(config.netPath + Config.jsonRequest, data: request)
+    //     .then((value) {
+    //   if (value.data[Config.returnStatus] != Config.succeedStatus) {
+    //     return false;
+    //   }
+    //   List problems = value.data['problems'] as List;
+    //   problemList = List.generate(problems.length, (index) {
+    //     return Problem.fromJson(problems[index]);
+    //   });
+    //
+    //   notifyListeners();
+    //   return true;
+    // }).onError((error, stackTrace) {
+    //   debugPrint(error.toString());
+    //   return false;
+    // });
   }
 
 // 下载题目描述文件
@@ -163,9 +223,9 @@ class ProblemModel extends ChangeNotifier {
     while (true) {
       String fileName = '${FuncOne.generateRandomString(10)}.pdf';
       //如果文件名已存在,就重新生成一个文件名
-      if (!await config.isExistFile(
-          config.downloadFilePath, fileName)) {
-        problemList[curProblem].pdfFileName = config.downloadFilePath + fileName;
+      if (!await config.isExistFile(config.downloadFilePath, fileName)) {
+        problemList[curProblem].pdfFileName =
+            config.downloadFilePath + fileName;
         break;
       }
     }
@@ -179,10 +239,12 @@ class ProblemModel extends ChangeNotifier {
           config.netPath + Config.jsonRequest,
           data: request,
           options: Options(responseType: ResponseType.bytes));
-      File file =
-          File(problemList[curProblem].pdfFileName);
+      File file = File(problemList[curProblem].pdfFileName);
       await file.writeAsBytes(response.data);
       flag = true;
+      pdfController.document =
+          PdfDocument.openFile(problemList[curProblem].pdfFileName);
+      await pdfController.document;
       notifyListeners();
     } catch (e) {
       debugPrint(e.toString());
@@ -193,19 +255,12 @@ class ProblemModel extends ChangeNotifier {
 //  下载样例文件
   Future<bool> downloadExampleFile(
       Config config, String contestId, int columnIndex, int rowIndex) async {
-    //将样例存放在内存中，因此不太适合存放数据量太大的样例
-    if(rowIndex == 1 && problemList[curProblem].exampleFileList[columnIndex].inText.isNotEmpty){
-      return true;
-    }else if(rowIndex == 2 && problemList[curProblem].exampleFileList[columnIndex].outText.isNotEmpty){
-      return true;
-    }
     String filePath =
         problemList[curProblem].exampleFileList[columnIndex].inFilePath;
     if (rowIndex == 2) {
       filePath =
           problemList[curProblem].exampleFileList[columnIndex].outFilePath;
     }
-    debugPrint(filePath);
     Map request = {
       'requestType': 'downloadExampleFile',
       'info': [filePath]
@@ -216,13 +271,15 @@ class ProblemModel extends ChangeNotifier {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
       }
-      if(rowIndex == 1){
+      if (rowIndex == 1) {
         // FIXME 因为现在上传的样例文件都是只有一行而已，所以换行符的问题可能存在
-        problemList[curProblem].exampleFileList[columnIndex].inText = value.data['exampleFile'];
-      }else{
-        problemList[curProblem].exampleFileList[columnIndex].outText = value.data['exampleFile'];
+        problemList[curProblem].exampleFileList[columnIndex].inText =
+            value.data['exampleFile'];
+      } else {
+        problemList[curProblem].exampleFileList[columnIndex].outText =
+            value.data['exampleFile'];
       }
-      notifyListeners();
+      debugPrint(value.data['exampleFile'].toString());
       return true;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
