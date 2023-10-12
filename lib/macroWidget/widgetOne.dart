@@ -31,7 +31,7 @@ class RatioBar extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Text(
                       '$numerator / $denominator',
-                      style: const TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: Colors.black45),
                     ))
               ]),
               Expanded(
@@ -50,7 +50,7 @@ class RatioBar extends StatelessWidget {
                           width: (constraints.maxWidth - 10 < 0 ? 0 : constraints.maxWidth - 10) *
                               (denominator == 0 ? 1 : numerator / denominator),
                           decoration: BoxDecoration(
-                            color: Colors.grey,
+                            color: Colors.black45,
                             borderRadius: BorderRadius.only(
                                 topLeft: const Radius.circular(4),
                                 bottomLeft: const Radius.circular(4),

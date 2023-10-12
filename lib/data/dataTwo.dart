@@ -12,6 +12,7 @@ class ExampleFile {
   late String exampleId;
   late String inFilePath;
   late String outFilePath;
+
   //将样例存放在内存中
   String inText = '';
   String outText = '';
@@ -47,6 +48,7 @@ class Problem {
   late String timeLimit;
   late String memoryLimit;
   late String maxFileLimit;
+
   //是否已经下载样例文件
   bool isDownloadExampleFile = false;
   List<ExampleFile> exampleFileList = [];
@@ -85,14 +87,11 @@ class Problem {
 class ProblemModel extends ChangeNotifier {
   //先初始化好
   List<Problem> problemList = [];
-  late Config config;
-  late String contestId;
+
 //当前浏览的是哪一道题目，因为这里的默认下标是0
   int curProblem = -1;
-  PdfController pdfController = PdfController(
-    document:
-        PdfDocument.openFile(r'C:\Users\QQ123456\Downloads\problemxiaobai.pdf'),
-  );
+  PdfController? pdfController;
+
   //上一次的请求时间跟这一次的请求时间至少要距离requestGap
   static const int requestGap = 60 * 5;
   DateTime? latestRequestTime;
@@ -103,16 +102,24 @@ class ProblemModel extends ChangeNotifier {
     curProblem = 0;
     notifyListeners();
   }
-
-  void switchProblem(int id) async {
-    debugPrint(id.toString());
+  //切换题目，同时下载题目和样例文件
+  void switchProblem(int id, Config config, String contestId) async {
     if (curProblem != id) {
       if (problemList.isNotEmpty) {
         curProblem = id;
         if (await downloadProblemFile(config, contestId)) {
-          pdfController.loadDocument(
-              PdfDocument.openFile(problemList[curProblem].pdfFileName));
+          if (pdfController == null) {
+            pdfController = PdfController(
+                document:
+                    PdfDocument.openFile(problemList[curProblem].pdfFileName));
+          } else {
+            pdfController!.loadDocument(
+                PdfDocument.openFile(problemList[curProblem].pdfFileName));
+          }
+
           notifyListeners();
+        } else {
+          //  FIXME 这里假设下载题目描述文件一定成功
         }
 
         if (!problemList[curProblem].isDownloadExampleFile) {
@@ -134,7 +141,6 @@ class ProblemModel extends ChangeNotifier {
             }
             if (flag) {
               problemList[curProblem].isDownloadExampleFile = true;
-              debugPrint("example file get succeed");
             }
           }).catchError((onError) {
             debugPrint(onError.toString());
@@ -158,10 +164,15 @@ class ProblemModel extends ChangeNotifier {
     //2.创建一个监听ProblemModel的ChangeNotifierProvider<ProblemModel>，这样就可以监听到了
   }
 
+  String getExampleText(int column,int row){
+    if(row == 1){
+      return problemList[curProblem].exampleFileList[column].inText;
+    }
+    return problemList[curProblem].exampleFileList[column].outText;
+  }
+
   //请求题目数据
   Future<bool> requestProblemData(Config config, String contestId) async {
-    this.config = config;
-    this.contestId = contestId;
     if (latestRequestTime != null &&
         DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
       return true;
@@ -194,25 +205,8 @@ class ProblemModel extends ChangeNotifier {
     if (problemList.isEmpty) {
       return true;
     }
-    switchProblem(0);
+    switchProblem(0, config, contestId);
     return flag;
-    // return await Config.dio
-    //     .post(config.netPath + Config.jsonRequest, data: request)
-    //     .then((value) {
-    //   if (value.data[Config.returnStatus] != Config.succeedStatus) {
-    //     return false;
-    //   }
-    //   List problems = value.data['problems'] as List;
-    //   problemList = List.generate(problems.length, (index) {
-    //     return Problem.fromJson(problems[index]);
-    //   });
-    //
-    //   notifyListeners();
-    //   return true;
-    // }).onError((error, stackTrace) {
-    //   debugPrint(error.toString());
-    //   return false;
-    // });
   }
 
 // 下载题目描述文件
@@ -242,9 +236,6 @@ class ProblemModel extends ChangeNotifier {
       File file = File(problemList[curProblem].pdfFileName);
       await file.writeAsBytes(response.data);
       flag = true;
-      pdfController.document =
-          PdfDocument.openFile(problemList[curProblem].pdfFileName);
-      await pdfController.document;
       notifyListeners();
     } catch (e) {
       debugPrint(e.toString());
@@ -279,7 +270,6 @@ class ProblemModel extends ChangeNotifier {
         problemList[curProblem].exampleFileList[columnIndex].outText =
             value.data['exampleFile'];
       }
-      debugPrint(value.data['exampleFile'].toString());
       return true;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());

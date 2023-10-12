@@ -250,4 +250,22 @@ class MyDialogs {
         align: const Alignment(0.95, -0.75),
         duration: Duration(seconds: duration));
   }
+
+  //在特定组件上方显示一段文本
+  static VoidCallback smallTip(BuildContext context, String text) {
+    return BotToast.showAttachedWidget(
+        targetContext: context,
+        attachedBuilder: (cancel) {
+          return Card(
+              child: Container(
+            color: Colors.grey[100],
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              text,
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.w500),
+            ),
+          ));
+        });
+  }
 }

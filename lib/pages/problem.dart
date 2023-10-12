@@ -6,6 +6,7 @@ import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
 import 'package:owo_user/macroWidget/widgetOne.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 class ProblemBody extends StatelessWidget {
   const ProblemBody({Key? key}) : super(key: key);
@@ -25,21 +26,13 @@ class ProblemBody extends StatelessWidget {
                 Expanded(
                     child: Container(
                         color: Colors.grey[100],
+                        margin: const EdgeInsets.only(left: 10, right: 10),
                         child: Builder(
                           builder: (BuildContext context) {
                             return const MyPdfViewer();
                           },
                         ))),
-                Container(
-                  width: 300,
-                  color: Colors.lightBlueAccent,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: 'hello world !'));
-                    },
-                    child: Text('copy'),
-                  ),
-                )
+                _RightModule()
               ],
             ))
         : Container(
@@ -69,16 +62,17 @@ class _QuestionList extends StatelessWidget {
     return Container(
         width: 75,
         height: 600,
-        margin: const EdgeInsets.only(left: 60),
+        margin: const EdgeInsets.only(left: 30),
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.black54,
-                  offset: Offset(1.0, 1.0),
-                  blurRadius: 1.0)
-            ]),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[300]!, width: 1.0),
+            top: BorderSide(color: Colors.grey[300]!, width: 1.0),
+            left: BorderSide(color: Colors.grey[300]!, width: 1.0),
+            right: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+        ),
         child: ListView.builder(
             itemCount: inProblemModel.problemList.length,
             itemBuilder: (BuildContext context, int index) {
@@ -89,7 +83,8 @@ class _QuestionList extends StatelessWidget {
                     : Colors.transparent,
                 child: TextButton(
                     onPressed: () {
-                      ChangeNotifierProvider.of<ProblemModel>(context).switchProblem(index);
+                      ChangeNotifierProvider.of<GlobalData>(context)
+                          .switchProblem(index);
                     },
                     style: ButtonStyle(
                         minimumSize:
@@ -114,378 +109,253 @@ class MyPdfViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PdfController _pdfController = ChangeNotifierProvider.of<ProblemModel>(context).pdfController;
-    // debugPrint(_pdfController.document)
-    // debugPrint(_pdfController.document.toString());
-    // debugPrint("pdf viewer");
-    return Stack(
-      children: [
-        PdfView(
-          controller: _pdfController,
-          renderer: (PdfPage page) => page.render(
-              width: page.width * 2,
-              height: page.height * 2,
-              format: PdfPageImageFormat.jpeg,
-              backgroundColor: '#FFFFFF'),
-        ),
-        Align(
-            alignment: Alignment.topRight,
-            child: SizedBox(
-              width: 100,
-              height: 200,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: 40,
-                    width: 100,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(2, (index) {
-                          return ElevatedButton(
-                              style: ButtonStyle(
-                                  minimumSize: MaterialStateProperty.all(
-                                      const Size(40, 40))),
-                              onPressed: () {
-                                if (index == 0) {
-                                  _pdfController.previousPage(
-                                      duration: const Duration(seconds: 1),
-                                      curve: Curves.ease);
-                                } else {
-                                  _pdfController.nextPage(
-                                      duration: const Duration(seconds: 1),
-                                      curve: Curves.ease);
-                                }
-                              },
-                              child: Text(index == 0 ? '<' : '>'));
-                        })),
-                  ),
-                  PdfPageNumber(
-                    controller: _pdfController,
-                    builder: (_, loadingState, page, pagesCount) => Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        '$page/${pagesCount ?? 0}',
-                        style: const TextStyle(fontSize: 22),
-                      ),
-                    ),
-                  ),
-                ],
+    final PdfController? pdfController =
+        ChangeNotifierProvider.of<ProblemModel>(context).pdfController;
+    return pdfController != null
+        ? Stack(
+            children: [
+              PdfView(
+                controller: pdfController,
+                renderer: (PdfPage page) => page.render(
+                    width: page.width * 2,
+                    height: page.height * 2,
+                    format: PdfPageImageFormat.jpeg,
+                    backgroundColor: '#FFFFFF'),
               ),
-            )),
-      ],
-    );
+              Align(
+                  alignment: Alignment.topRight,
+                  child: SizedBox(
+                    width: 100,
+                    height: 200,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          width: 100,
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(2, (index) {
+                                return ElevatedButton(
+                                    style: ButtonStyle(
+                                        minimumSize: MaterialStateProperty.all(
+                                            const Size(40, 40))),
+                                    onPressed: () {
+                                      if (index == 0) {
+                                        pdfController.previousPage(
+                                            duration:
+                                                const Duration(seconds: 1),
+                                            curve: Curves.ease);
+                                      } else {
+                                        pdfController.nextPage(
+                                            duration:
+                                                const Duration(seconds: 1),
+                                            curve: Curves.ease);
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: Text(
+                                        index == 0 ? '<' : '>',
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ));
+                              })),
+                        ),
+                        PdfPageNumber(
+                          controller: pdfController,
+                          builder: (_, loadingState, page, pagesCount) =>
+                              Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              '$page/${pagesCount ?? 0}',
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ],
+          )
+        : Container();
   }
 }
 
-class _ProblemInfo extends StatelessWidget {
-  const _ProblemInfo({Key? key}) : super(key: key);
+class _RightModule extends StatelessWidget {
+  // const _RightModule({Key? key}) : super(key: key);
+  //===================================================================================
+  // BuildContext targetContext;
+  // Offset target;
+  double verticalOffset = 0;
+  double horizontalOffset = 0;
+  int second = 4;
+  PreferDirection preferDirection = PreferDirection.topCenter;
+  bool ignoreContentClick = false;
+  bool onlyOne = true;
+  bool allowClick = true;
+  bool enableSafeArea = true;
+  int backgroundColor = 0x00000000;
+  int animationMilliseconds = 200;
+  int animationReverseMilliseconds = 200;
+
+  double buttonAlign = 0;
+
+  CancelFunc show({BuildContext? context, Offset? target}) {
+    return BotToast.showAttachedWidget(
+        target: target,
+        targetContext: context,
+        verticalOffset: verticalOffset,
+        horizontalOffset: horizontalOffset,
+        duration: Duration(seconds: second),
+        animationDuration: Duration(milliseconds: animationMilliseconds),
+        animationReverseDuration:
+            Duration(milliseconds: animationReverseMilliseconds),
+        preferDirection: preferDirection,
+        ignoreContentClick: ignoreContentClick,
+        onlyOne: onlyOne,
+        allowClick: allowClick,
+        enableSafeArea: enableSafeArea,
+        backgroundColor: Color(backgroundColor),
+        attachedBuilder: (cancel) => (Card(
+              color: Colors.amber,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(5),
+                      ),
+                      onPressed: () {
+                        BotToast.showSimpleNotification(title: "Tap favorite");
+                      },
+                      label: const Text("favorite"),
+                      icon: const Icon(Icons.favorite, color: Colors.redAccent),
+                    ),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(5),
+                      ),
+                      onPressed: () {
+                        BotToast.showSimpleNotification(title: "Tap bookmark");
+                      },
+                      label: const Text("bookmark"),
+                      icon: const Icon(Icons.bookmark, color: Colors.redAccent),
+                    )
+                  ],
+                ),
+              ),
+            )));
+  }
+
+  //===================================================================================
 
   @override
   Widget build(BuildContext context) {
     ProblemModel problemModel =
         ChangeNotifierProvider.of<ProblemModel>(context);
-    int curProblemId = ChangeNotifierProvider.of<ProblemModel>(context)
-        .curProblem; //unknown platforms
     return Container(
-        width: double.infinity,
-        height: double.infinity,
-        margin: const EdgeInsets.only(left: 40, right: 60, top: 30, bottom: 30),
-        // padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(2),
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(1.0, 1.0),
-                  blurRadius: 2.0)
-            ]),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                    height: 60,
-                    width: 100,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        // MyDialogs.processingBar(context, 'downloading');
-                        // bool flag =
-                        // await ChangeNotifierProvider.of<GlobalData>(context)
-                        //     .downloadProblemFile();
-                        //不管怎么样，这一行代码都要执行
-                        // Navigator.pop(context);
-                        // if (flag) {
-                        //   MyDialogs.oneToast(['Download file succeed', ''],
-                        //       infoStatus: 2);
-                        // } else {
-                        //   MyDialogs.oneToast(['Download file fail', ''],
-                        //       infoStatus: 1);
-                        // }
-                      },
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0)),
-                          side: BorderSide.none,
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.grey),
-                      child: const Icon(
-                        Icons.download,
-                        color: Colors.grey,
-                      ),
-                    )),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      problemModel.problemList[curProblemId].problemName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 60,
-                  width: 100,
-                ),
-              ],
-            ),
-            Container(height: 1, color: Colors.grey),
-            Row(
-              children: [
-                Expanded(
-                    child: Column(
-                  children: [
-                    _SrcLimit(
-                        iconText: 'T',
-                        limitText:
-                            '${problemModel.problemList[curProblemId].timeLimit} ms'),
-                    _SrcLimit(
-                        iconText: 'M',
-                        limitText:
-                            '${problemModel.problemList[curProblemId].memoryLimit} mb'),
-                  ],
-                )),
-                // Container(height: 150, width: 1, color: Colors.grey),
-                Expanded(
-                    child: Column(
-                  children: [
-                    Center(
-                      child: RatioBar(
-                          numerator: int.parse(
-                              problemModel.problemList[curProblemId].submitAc),
-                          denominator: int.parse(problemModel
-                              .problemList[curProblemId].submitTotal)),
-                    ),
-                    const SizedBox(height: 50),
-                    ElevatedButton(
-                        onPressed: () async {
-                          int submitStatus =
-                              await ChangeNotifierProvider.of<GlobalData>(
-                                      context)
-                                  .submitCodeFile();
-                          if (submitStatus == 0) {
-                            MyDialogs.oneToast(['submit succeed', ''],
-                                infoStatus: 2);
-                          } else if (submitStatus == 2) {
-                            MyDialogs.oneToast(['file is too large', ''],
-                                infoStatus: 1);
-                          } else if (submitStatus == 3) {
-                            MyDialogs.oneToast(['file type error', ''],
-                                infoStatus: 1);
-                          } else if (submitStatus == 4) {
-                            MyDialogs.oneToast(['submit fail', ''],
-                                infoStatus: 1);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 60),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0)),
-                            side: BorderSide.none,
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.grey),
-                        child: const Text(
-                          'submit',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500),
-                        )),
-                    const SizedBox(height: 30),
-                  ],
-                )),
-              ],
-            ),
-            Container(height: 20),
-            Container(
-              height: 30,
-              color: Colors.grey[100],
-              child: Row(
-                children: List.generate(3, (index) {
-                  List<String> list = [
-                    'Example Id',
-                    'In File Download',
-                    'Out File DownLoad'
-                  ];
-                  return Expanded(
-                      child: Center(
-                          child: Text(
-                    list[index],
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16),
-                  )));
-                }),
-              ),
-            ),
-            Expanded(
-                child: problemModel
-                        .problemList[curProblemId].exampleFileList.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Not exists example file',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w300),
-                        ),
-                      )
-                    : ListView.separated(
-                        separatorBuilder: (BuildContext context, int index) {
-                          return Container(height: 1, color: Colors.grey[300]);
-                        },
-                        itemCount: problemModel
-                            .problemList[curProblemId].exampleFileList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return SizedBox(
-                            height: 50,
-                            child: Row(
-                              children: List.generate(3, (rowIndex) {
-                                return Expanded(
-                                    child: Center(
-                                        child: TextButton(
-                                            onPressed: () async {
-                                              // if (rowIndex == 0) {
-                                              //   return;
-                                              // }
-                                              // MyDialogs.processingBar(
-                                              //     context, 'downloading');
-                                              // bool flag =
-                                              //     await ChangeNotifierProvider
-                                              //             .of<GlobalData>(
-                                              //                 context)
-                                              //         .downloadExampleFile(
-                                              //             index, rowIndex);
-                                              // Navigator.pop(context);
-                                              // if (flag) {
-                                              //   MyDialogs.oneToast([
-                                              //     'download file succeed',
-                                              //     ''
-                                              //   ], infoStatus: 2);
-                                              // } else {
-                                              //   MyDialogs.oneToast(
-                                              //       ['download file fail', ''],
-                                              //       infoStatus: 1);
-                                              // }
-                                            },
-                                            child: Text(
-                                              rowIndex == 0
-                                                  ? '#${index + 1}'
-                                                  : '${String.fromCharCode(65 + curProblemId)}_${rowIndex == 1 ? 'in' : 'out'}${index + 1}',
-                                              style: const TextStyle(
-                                                  color: Colors.black54,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 16),
-                                            ))));
-                              }),
-                            ),
-                          );
-                        })),
-          ],
-        ));
-  }
-}
-
-//显示资源限制的组件
-class _SrcLimit extends StatelessWidget {
-  const _SrcLimit({Key? key, required this.iconText, required this.limitText})
-      : super(key: key);
-  final String limitText;
-  final String iconText;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70,
-      child: Row(
+      width: 300,
+      height: 600,
+      margin: const EdgeInsets.only(right: 30),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[300]!, width: 1.0),
+            top: BorderSide(color: Colors.grey[300]!, width: 1.0),
+            left: BorderSide(color: Colors.grey[300]!, width: 1.0),
+            right: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          borderRadius: BorderRadius.circular(2)),
+      child: Column(
         children: [
-          const SizedBox(width: 20),
+          const SizedBox(height: 10),
+          RatioBar(
+              numerator: int.parse(
+                  problemModel.problemList[problemModel.curProblem].submitAc),
+              denominator: int.parse(problemModel
+                  .problemList[problemModel.curProblem].submitTotal)),
+          const SizedBox(height: 20),
+          Container(height: 1, color: Colors.black38),
+          const SizedBox(height: 10),
+          const Text(
+            'Example   Copy',
+            style: TextStyle(
+                color: Colors.grey, fontWeight: FontWeight.w500, fontSize: 20),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+              child: ListView.builder(
+                  itemExtent: 60,
+                  itemCount: problemModel.problemList[problemModel.curProblem]
+                      .exampleFileList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      color: index % 2 == 0 ? Colors.teal[50] : Colors.white,
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(3, (rowIndex) {
+                            return Builder(builder: (BuildContext context) {
+                              return TextButton(
+                                  onPressed: () {
+                                    if (rowIndex == 0) {
+                                      return;
+                                    }
+                                    // show(context: context);
+                                    MyDialogs.smallTip(context,'copied');
+                                    String text =
+                                        ChangeNotifierProvider.of<ProblemModel>(
+                                                context)
+                                            .getExampleText(index, rowIndex);
+                                    Clipboard.setData(
+                                        ClipboardData(text: text));
+                                  },
+                                  child: Text(rowIndex == 0
+                                      ? '#$index'
+                                      : (rowIndex == 1 ? 'in' : 'out')));
+                            });
+                          })),
+                    );
+                  })),
+          const SizedBox(height: 10),
+          Container(height: 1, color: Colors.black38),
+          const SizedBox(height: 5),
           Container(
-            width: 60,
-            height: 60,
-            margin: EdgeInsets.only(
-                top: iconText == 'T' ? 6 : 4, bottom: iconText == 'T' ? 4 : 6),
-            decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(30)),
-            child: Center(
-              child: Text(
-                iconText,
+            height: 80,
+            padding: const EdgeInsets.all(10),
+            child: ElevatedButton(
+              onPressed: () async {
+                int submitStatus =
+                    await ChangeNotifierProvider.of<GlobalData>(context)
+                        .submitCodeFile();
+                if (submitStatus == 0) {
+                  MyDialogs.oneToast(['submit succeed', ''], infoStatus: 0);
+                } else if (submitStatus == 2) {
+                  MyDialogs.oneToast(['file is too large', ''], infoStatus: 2);
+                } else if (submitStatus == 3) {
+                  MyDialogs.oneToast(['file type error', ''], infoStatus: 2);
+                } else if (submitStatus == 4) {
+                  MyDialogs.oneToast(['submit fail', ''], infoStatus: 2);
+                }
+              },
+              style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(
+                      const Size(double.infinity, double.infinity))),
+              child: const Text(
+                'submit',
                 style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w600,
-                    fontSize: iconText == 'T' ? 35 : 30),
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500),
               ),
             ),
           ),
-          Expanded(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'C/C++',
-                style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400),
-              ),
-              Text(
-                'Other',
-                style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400),
-              ),
-            ],
-          )),
-          Expanded(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                limitText,
-                style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400),
-              ),
-              const Text(
-                'twice',
-                style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400),
-              ),
-            ],
-          )),
+          const SizedBox(height: 5),
         ],
       ),
     );
