@@ -71,8 +71,8 @@ class HomeTitle extends StatelessWidget {
               '$startTime to $endTime',
               style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15),
             )
           ],
         )

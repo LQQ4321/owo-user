@@ -307,7 +307,7 @@ class _RightModule extends StatelessWidget {
                                       return;
                                     }
                                     // show(context: context);
-                                    MyDialogs.smallTip(context,'copied');
+                                    MyDialogs.smallTip(context, 'copied');
                                     String text =
                                         ChangeNotifierProvider.of<ProblemModel>(
                                                 context)
@@ -330,17 +330,37 @@ class _RightModule extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () async {
-                int submitStatus =
+                List<String> list =
                     await ChangeNotifierProvider.of<GlobalData>(context)
-                        .submitCodeFile();
-                if (submitStatus == 0) {
-                  MyDialogs.oneToast(['submit succeed', ''], infoStatus: 0);
-                } else if (submitStatus == 2) {
+                        .selectFile();
+                if (list.isEmpty) {
+                  //  未选中文件
+                } else if (list.length == 1) {
+                  //  选中的文件太大
                   MyDialogs.oneToast(['file is too large', ''], infoStatus: 2);
-                } else if (submitStatus == 3) {
+                } else if (list.length == 2) {
+                  //  没有对应的语言
                   MyDialogs.oneToast(['file type error', ''], infoStatus: 2);
-                } else if (submitStatus == 4) {
-                  MyDialogs.oneToast(['submit fail', ''], infoStatus: 2);
+                } else {
+                  //  正常
+                  bool flag = await MyDialogs.hintMessage(
+                      context,
+                      [
+                        'Are you sure to submit problem ${String.fromCharCode(65+problemModel.curProblem)} ?',
+                        'language ${list[0]}  ,  ${list[1]}'
+                      ],
+                      buttonCount: 2);
+                  if (flag) {
+                    MyDialogs.oneToast(['submitting',''],infoStatus: 0);
+                    bool submitStatus =
+                        await ChangeNotifierProvider.of<GlobalData>(context)
+                            .submitCodeFile(list);
+                    if (submitStatus) {
+                      MyDialogs.oneToast(['submit succeed', ''], infoStatus: 0);
+                    } else {
+                      MyDialogs.oneToast(['submit fail', ''], infoStatus: 2);
+                    }
+                  }
                 }
               },
               style: ButtonStyle(

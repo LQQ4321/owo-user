@@ -20,7 +20,7 @@ class MyDialogs {
   //进度显示器，但是进度只是给用户看的，消除用户的等待疲劳
   static Future<dynamic> processingBar(BuildContext context, String text) {
     return showMyDialog(context, Builder(builder: (context) {
-      return Container(
+      return SizedBox(
         width: 300,
         height: 100,
         child: Column(
@@ -44,10 +44,16 @@ class MyDialogs {
   static Future<dynamic> userStatus(BuildContext context) {
     return showMyDialog(context, Builder(builder: (context) {
       List<String> userInfo = [];
-      userInfo.add(ChangeNotifierProvider.of<GlobalData>(context).studentName);
+      userInfo.add(ChangeNotifierProvider
+          .of<GlobalData>(context)
+          .studentName);
       userInfo
-          .add(ChangeNotifierProvider.of<GlobalData>(context).studentNumber);
-      userInfo.add(ChangeNotifierProvider.of<GlobalData>(context).schoolName);
+          .add(ChangeNotifierProvider
+          .of<GlobalData>(context)
+          .studentNumber);
+      userInfo.add(ChangeNotifierProvider
+          .of<GlobalData>(context)
+          .schoolName);
       return Column(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(
           width: 350,
@@ -64,18 +70,18 @@ class MyDialogs {
               const SizedBox(width: 30),
               Column(
                   children: List.generate(userInfo.length, (index) {
-                return SizedBox(
-                  height: 30,
-                  width: 230,
-                  child: Text(
-                    userInfo[index],
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 20),
-                  ),
-                );
-              }))
+                    return SizedBox(
+                      height: 30,
+                      width: 230,
+                      child: Text(
+                        userInfo[index],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 20),
+                      ),
+                    );
+                  }))
             ],
           ),
         ),
@@ -92,7 +98,7 @@ class MyDialogs {
             style: ButtonStyle(
                 minimumSize: MaterialStateProperty.all(const Size(350, 50)),
                 backgroundColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.redAccent)),
+                        (states) => Colors.redAccent)),
             child: const Text(
               'Logout',
               style: TextStyle(
@@ -109,9 +115,9 @@ class MyDialogs {
   // 状态，默认是提示，还有失败和成功两种状态,对应的颜色会不一样
   static Future<dynamic> hintMessage(BuildContext context, List<String> texts,
       {int buttonCount = 1,
-      int status = 0,
-      String leftButText = 'CANCEL',
-      String rightButText = 'CONFIRM'}) {
+        int status = 0,
+        String leftButText = 'CANCEL',
+        String rightButText = 'CONFIRM'}) {
     return showMyDialog(context, Builder(builder: (context) {
       return Column(
         //高度尽可能大，宽度取最大的子元素
@@ -131,28 +137,28 @@ class MyDialogs {
                   children: [
                     Padding(
                       padding:
-                          const EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                      const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                       child: ConstantData.infoIcons[status],
                     ),
                     Expanded(
                         child: Text(
-                      texts[0],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w700),
-                    ))
+                          texts[0],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w700),
+                        ))
                   ],
                 ),
-                Text(
-                  texts[1],
-                  maxLines: 3,
+                Align(alignment: Alignment.centerLeft, child: Text(
+                  '   ${texts[1]}',
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey),
-                ),
+                ))
               ],
             ),
           ),
@@ -168,9 +174,9 @@ class MyDialogs {
                 return OutlinedButton(
                     style: ButtonStyle(
                         backgroundColor: MaterialStateColor.resolveWith(
-                            (states) => Colors.blue[100]!),
+                                (states) => Colors.blue[100]!),
                         minimumSize:
-                            MaterialStateProperty.all(const Size(100, 50))),
+                        MaterialStateProperty.all(const Size(100, 50))),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
@@ -186,7 +192,7 @@ class MyDialogs {
               return ElevatedButton(
                   style: ButtonStyle(
                       minimumSize:
-                          MaterialStateProperty.all(const Size(100, 50))),
+                      MaterialStateProperty.all(const Size(100, 50))),
                   onPressed: () {
                     Navigator.pop(context, true);
                   },
@@ -227,23 +233,25 @@ class MyDialogs {
                           borderRadius: BorderRadius.circular(4))),
                   Column(
                       children: List.generate(texts.length, (index) {
-                    return Container(
-                      height: index == 0 ? 30 : 50,
-                      width: 270,
-                      padding: EdgeInsets.only(
-                          top: index == 0 ? 3 : 0, bottom: index == 0 ? 0 : 3),
-                      child: Text(
-                        texts[index],
-                        maxLines: index == 0 ? 1 : 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: index == 0 ? Colors.black87 : Colors.grey,
-                            fontSize: index == 0 ? 18 : 15,
-                            fontWeight:
+                        return Container(
+                          height: index == 0 ? 30 : 50,
+                          width: 270,
+                          padding: EdgeInsets.only(
+                              top: index == 0 ? 3 : 0,
+                              bottom: index == 0 ? 0 : 3),
+                          child: Text(
+                            texts[index],
+                            maxLines: index == 0 ? 1 : 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: index == 0 ? Colors.black87 : Colors
+                                    .grey,
+                                fontSize: index == 0 ? 18 : 15,
+                                fontWeight:
                                 index == 0 ? FontWeight.w500 : FontWeight.w300),
-                      ),
-                    );
-                  }))
+                          ),
+                        );
+                      }))
                 ],
               ));
         },
@@ -255,17 +263,18 @@ class MyDialogs {
   static VoidCallback smallTip(BuildContext context, String text) {
     return BotToast.showAttachedWidget(
         targetContext: context,
+        duration: const Duration(seconds: 5),
         attachedBuilder: (cancel) {
           return Card(
               child: Container(
-            color: Colors.grey[100],
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              text,
-              style: const TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.w500),
-            ),
-          ));
+                color: Colors.grey[100],
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.w500),
+                ),
+              ));
         });
   }
 }

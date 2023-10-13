@@ -51,6 +51,7 @@ dev_dependencies:
   internet_file: ^1.2.0
   universal_platform: ^1.0.0+1
   performance: ^0.1.0+1
+  font_awesome_flutter: ^10.5.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -72,6 +73,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/images/picture1.png
     - assets/images/picture1.jpg
     - assets/images/picture2.jpg
     - assets/images/picture3.jpg
@@ -84,6 +86,7 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
 
+  #图标在机房显示错误，好像是编码的问题，这里String.fromCharCode(0),返回的是一个方框，和机房的问题对应
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

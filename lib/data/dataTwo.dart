@@ -102,6 +102,7 @@ class ProblemModel extends ChangeNotifier {
     curProblem = 0;
     notifyListeners();
   }
+
   //切换题目，同时下载题目和样例文件
   void switchProblem(int id, Config config, String contestId) async {
     if (curProblem != id) {
@@ -164,8 +165,8 @@ class ProblemModel extends ChangeNotifier {
     //2.创建一个监听ProblemModel的ChangeNotifierProvider<ProblemModel>，这样就可以监听到了
   }
 
-  String getExampleText(int column,int row){
-    if(row == 1){
+  String getExampleText(int column, int row) {
+    if (row == 1) {
       return problemList[curProblem].exampleFileList[column].inText;
     }
     return problemList[curProblem].exampleFileList[column].outText;
@@ -279,18 +280,17 @@ class ProblemModel extends ChangeNotifier {
   }
 
 //  提交代码文件
-  //0表示提交成功，1表示没有选中文件，2表示提交文件过大，3表示不支持该文件类型，4表示提交文件提交失败
-  Future<int> submitCodeFile(
-      Config config, String studentNumber, String contestId) async {
+//  首先选择文件(应该把config.selectAFile调成静态方法,这样就不必经过GlobalData获取config了)
+  Future<List<String>> selectFile(Config config) async {
     FilePickerResult? filePickerResult =
         await config.selectAFile(ConstantData.fileSuffix);
     if (filePickerResult == null) {
-      return 1;
+      return [];
     }
     //这里比较的单位是kb
     if ((filePickerResult.files.single.size >> 10) >
         int.parse(problemList[curProblem].maxFileLimit)) {
-      return 2;
+      return [''];
     }
     String language = 'other';
     for (int i = 0; i < ConstantData.fileSuffix.length; i++) {
@@ -300,25 +300,35 @@ class ProblemModel extends ChangeNotifier {
       }
     }
     if (language == 'other') {
-      return 3;
+      return ['', ''];
     }
+    return [
+      language,
+      filePickerResult.files.single.path!,
+      filePickerResult.files.single.name
+    ];
+  }
+
+  //0表示提交成功,1表示提交失败
+  Future<bool> submitCodeFile(Config config, String studentNumber,
+      String contestId, List<String> list) async {
     FormData formData = FormData.fromMap({
       'requestType': 'submitCode',
-      'file': await MultipartFile.fromFile(filePickerResult.files.single.path!,
-          filename: filePickerResult.files.single.name),
+      'file': await MultipartFile.fromFile(list[1],
+          filename: list[2]),
       'contestId': contestId,
       'problemId': problemList[curProblem].problemId,
       'studentNumber': studentNumber,
-      'language': language,
+      'language': list[0],
       'submitTime': FuncOne.getCurFormatTime()
     });
     return await Config.dio
         .post(config.netPath + Config.formRequest, data: formData)
         .then((value) {
-      return value.data[Config.returnStatus] == Config.succeedStatus ? 0 : 4;
+      return value.data[Config.returnStatus] == Config.succeedStatus;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
-      return 4;
+      return false;
     });
   }
 }

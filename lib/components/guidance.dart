@@ -4,6 +4,7 @@ import 'package:owo_user/data/constData.dart';
 import 'package:owo_user/data/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // 导航栏，整个应用都会用到，一直固定在应用的顶部
 // 最左边是一个用户图标，中间是几个按钮，最右边是缩小，放大和关闭按钮
@@ -61,7 +62,7 @@ class _GuidanceState extends State<Guidance> {
                         duration: 5, infoStatus: 2);
                   }
                 },
-                icon: const Icon(Icons.refresh)),
+                icon: const FaIcon(FontAwesomeIcons.refresh)),
             const SizedBox(width: 15),
             const WindowButtons(),
           ],
@@ -79,7 +80,7 @@ class UserCell extends StatelessWidget {
         onPressed: () async {
           await MyDialogs.userStatus(context);
         },
-        icon: const Icon(Icons.person_outline));
+        icon: const FaIcon(FontAwesomeIcons.user));
   }
 }
 

@@ -105,8 +105,12 @@ class GlobalData extends ChangeNotifier {
   }
 
 //  提交代码文件
-  Future<int> submitCodeFile() async {
-    return await problemModel.submitCodeFile(config, studentNumber, contestId);
+  Future<List<String>> selectFile() async {
+    return await problemModel.selectFile(config);
+  }
+
+  Future<bool> submitCodeFile(List<String> list) async {
+    return await problemModel.submitCodeFile(config, studentNumber, contestId,list);
   }
 
 //  SubmitModel field

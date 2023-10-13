@@ -24,10 +24,10 @@ class LeftLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return const Stack(
       fit: StackFit.expand,
-      children: const [
-        FadeImage(imageUrl: "assets/images/picture1.jpg"),
+      children: [
+        FadeImage(imageUrl: "assets/images/picture1.png"),
       ],
     );
   }
