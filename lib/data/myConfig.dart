@@ -11,12 +11,15 @@ class Config {
   static var dio = Dio();
   static const String jsonRequest = "/studentJson";
   static const String formRequest = "/studentForm";
+  static const String managerJsonRequest = "/managerJson";
+  static const String managerFormRequest = "/managerForm";
   static const String returnStatus = 'status';
   static const String succeedStatus = 'succeed';
   static const String failStatus = 'fail';
 
   late String netPath;
   late String hostUserName;
+
   //如果不能得到用户名，应该让downloadFilePath为空，这样下载下来的文件应该是跟该程序在同一个目录下(等程序打包成exe后再验证)
   //或者可以将文件默认存放在c盘下,不过这样做有点粗鲁
   String downloadFilePath = 'C:\\';
@@ -87,5 +90,10 @@ class Config {
     }).onError((error, stackTrace) {
       return false;
     });
+  }
+
+//  管理员登录
+  Future<dynamic> managerLogin() async {
+
   }
 }

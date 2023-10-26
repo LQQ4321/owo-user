@@ -67,6 +67,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.of<GlobalData>(context).isLoginSucceed
         ? const Body()
-        : const Login();
+        : Login();
   }
 }

@@ -19,6 +19,7 @@ class GlobalData extends ChangeNotifier {
   late String schoolName;
 
   bool isLoginSucceed = false;
+  bool isUser = true;
   int butId = 0;
   bool matchStart = false;
 
@@ -30,6 +31,16 @@ class GlobalData extends ChangeNotifier {
   UserModel userModel = UserModel();
   SubmitModel submitModel = SubmitModel();
   NewsModel newsModel = NewsModel();
+
+//  login field
+//  切换登录用户的类型
+  void setLoginId(bool flag) {
+    if (isUser == flag) {
+      return;
+    }
+    isUser = flag;
+    notifyListeners();
+  }
 
 //body field
   void setButId(int id) {
@@ -93,14 +104,14 @@ class GlobalData extends ChangeNotifier {
 //  ProblemModel field
   // 有空研究一下是不是这里是不是一定要加上async关键字
   Future<bool> requestProblemData() async {
-    if(DateTime.parse(startTime).difference(DateTime.now()).inSeconds > 0) {
+    if (DateTime.parse(startTime).difference(DateTime.now()).inSeconds > 0) {
       return false;
     }
     return await problemModel.requestProblemData(config, contestId);
   }
 
   //切换当前题目
-  void switchProblem(int id){
+  void switchProblem(int id) {
     problemModel.switchProblem(id, config, contestId);
   }
 
@@ -110,7 +121,8 @@ class GlobalData extends ChangeNotifier {
   }
 
   Future<bool> submitCodeFile(List<String> list) async {
-    return await problemModel.submitCodeFile(config, studentNumber, contestId,list);
+    return await problemModel.submitCodeFile(
+        config, studentNumber, contestId, list);
   }
 
 //  SubmitModel field
