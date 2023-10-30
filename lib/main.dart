@@ -6,6 +6,7 @@ import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/user/dataThree.dart';
 import 'package:owo_user/data/user/dataTwo.dart';
 import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/pages/manager/body.dart';
 import 'package:owo_user/pages/user/body.dart';
 import 'package:owo_user/pages/login.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -92,7 +93,7 @@ class HomePage extends StatelessWidget {
     return ChangeNotifierProvider.of<RootData>(context).isLoginSucceed
         ? (ChangeNotifierProvider.of<RootData>(context).isUser
             ? const Body()
-            : Container())
+            : const MBody())
         : const Login();
   }
 }
