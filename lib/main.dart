@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/myConfig.dart';
 import 'package:owo_user/data/user/dataFive.dart';
 import 'package:owo_user/data/user/dataFour.dart';
 import 'package:owo_user/data/user/dataOne.dart';
@@ -13,6 +14,11 @@ import 'package:owo_user/data/manager/dataOne.dart';
 import 'package:owo_user/data/rootData.dart';
 
 void main() {
+
+  //调用获取主机用户名方法
+  //FIXME 有可能获取不到当前主机的用户名，从而导致下载路径错误
+  Config.setHostUserName();
+  //让配置相关方法在runApp之前启动应该没有问题吧
   runApp(const MyApp());
   doWhenWindowReady(() {
     final win = appWindow;
@@ -37,13 +43,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // 程序启动到结束为止，这里应该只会运行一次吧，如果不止一次，就会导致之前程序运行过程中的数据丢失掉
     // 将总数据提取出来，方便访问成员
-    GlobalData globalData = GlobalData();
-    //调用获取主机用户名方法
-    //FIXME 有可能获取不到当前主机的用户名，从而导致下载路径错误
-    //FIXME 得把这个config.setHostUserName()设成静态变量,不然user和manager都得调用一遍
-    globalData.config.setHostUserName();
-    MGlobalData mGlobalData = MGlobalData();
-    mGlobalData.config.setHostUserName();
+    RootData rootData = RootData();
+    //要确保赋值的时候不是值拷贝,不然provider就失效了(刚好dart对于复杂数据类型的调用就是以引用的方式)
+    GlobalData globalData = rootData.globalData;
+    MGlobalData mGlobalData = rootData.mGlobalData;
     return ChangeNotifierProvider<GlobalData>(
         //user
         data: globalData,
@@ -87,7 +90,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.of<RootData>(context).isLoginSucceed
-        ? const Body()
+        ? (ChangeNotifierProvider.of<RootData>(context).isUser
+            ? const Body()
+            : Container())
         : const Login();
   }
 }

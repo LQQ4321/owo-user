@@ -45,19 +45,20 @@ class NewsModel extends ChangeNotifier {
     newsList.clear();
     // 这里应该是需要调用notifyListeners()的，因为在GlobalData那里调用notifyListeners()，
     // 有些只监听了自己的数据变化，没有监听总的数据
-      notifyListeners();
+    notifyListeners();
   }
 
   void localAddNewMessage() {
     newsList.add(OneMessage(
-        isManager: false, text: textEditingController.text, sendTime: FuncOne.getCurFormatTime()));
+        isManager: false,
+        text: textEditingController.text,
+        sendTime: FuncOne.getCurFormatTime()));
     textEditingController.clear();
     notifyListeners();
   }
 
   //消息发送成功返回0；消息为空返回1；消息发送失败返回2；还没到间隔时间返回3
-  Future<int> sendNews(
-      Config config, String contestId, String studentNumber) async {
+  Future<int> sendNews(String contestId, String studentNumber) async {
     if (textEditingController.text.trim().isEmpty) {
       return 1;
     }
@@ -76,7 +77,7 @@ class NewsModel extends ChangeNotifier {
       ]
     };
     return await Config.dio
-        .post(config.netPath + Config.jsonRequest, data: request)
+        .post(Config.netPath + Config.jsonRequest, data: request)
         .then((value) {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return 2;
@@ -93,8 +94,7 @@ class NewsModel extends ChangeNotifier {
   }
 
   //请求消息
-  Future<bool> requestNewsData(
-      Config config, String contestId, String studentNumber) async {
+  Future<bool> requestNewsData(String contestId, String studentNumber) async {
     if (latestRequestTime != null &&
         DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
       return true;
@@ -105,7 +105,7 @@ class NewsModel extends ChangeNotifier {
       'info': [contestId, studentNumber]
     };
     return await Config.dio
-        .post(config.netPath + Config.jsonRequest, data: request)
+        .post(Config.netPath + Config.jsonRequest, data: request)
         .then((value) {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;

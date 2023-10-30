@@ -104,11 +104,11 @@ class ProblemModel extends ChangeNotifier {
   }
 
   //切换题目，同时下载题目和样例文件
-  void switchProblem(int id, Config config, String contestId) async {
+  void switchProblem(int id, String contestId) async {
     if (curProblem != id) {
       if (problemList.isNotEmpty) {
         curProblem = id;
-        if (await downloadProblemFile(config, contestId)) {
+        if (await downloadProblemFile(contestId)) {
           if (pdfController == null) {
             pdfController = PdfController(
                 document:
@@ -128,8 +128,8 @@ class ProblemModel extends ChangeNotifier {
           for (int i = 0;
               i < problemList[curProblem].exampleFileList.length;
               i++) {
-            funcList.add(downloadExampleFile(config, contestId, i, 1));
-            funcList.add(downloadExampleFile(config, contestId, i, 2));
+            funcList.add(downloadExampleFile(contestId, i, 1));
+            funcList.add(downloadExampleFile(contestId, i, 2));
           }
           Future.wait(funcList).then((value) {
             bool flag = true;
@@ -173,7 +173,7 @@ class ProblemModel extends ChangeNotifier {
   }
 
   //请求题目数据
-  Future<bool> requestProblemData(Config config, String contestId) async {
+  Future<bool> requestProblemData(String contestId) async {
     if (latestRequestTime != null &&
         DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
       return true;
@@ -185,7 +185,7 @@ class ProblemModel extends ChangeNotifier {
     };
     bool flag = false;
     flag = await Config.dio
-        .post(config.netPath + Config.jsonRequest, data: request)
+        .post(Config.netPath + Config.jsonRequest, data: request)
         .then((value) {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
@@ -206,21 +206,21 @@ class ProblemModel extends ChangeNotifier {
     if (problemList.isEmpty) {
       return true;
     }
-    switchProblem(0, config, contestId);
+    switchProblem(0, contestId);
     return flag;
   }
 
 // 下载题目描述文件
-  Future<bool> downloadProblemFile(Config config, String contestId) async {
+  Future<bool> downloadProblemFile(String contestId) async {
     if (problemList[curProblem].pdfFileName.isNotEmpty) {
       return true;
     }
     while (true) {
       String fileName = '${FuncOne.generateRandomString(10)}.pdf';
       //如果文件名已存在,就重新生成一个文件名
-      if (!await config.isExistFile(config.downloadFilePath, fileName)) {
+      if (!await Config.isExistFile(Config.downloadFilePath, fileName)) {
         problemList[curProblem].pdfFileName =
-            config.downloadFilePath + fileName;
+            Config.downloadFilePath + fileName;
         break;
       }
     }
@@ -231,7 +231,7 @@ class ProblemModel extends ChangeNotifier {
     bool flag = false;
     try {
       Response response = await Config.dio.post(
-          config.netPath + Config.jsonRequest,
+          Config.netPath + Config.jsonRequest,
           data: request,
           options: Options(responseType: ResponseType.bytes));
       File file = File(problemList[curProblem].pdfFileName);
@@ -246,7 +246,7 @@ class ProblemModel extends ChangeNotifier {
 
 //  下载样例文件
   Future<bool> downloadExampleFile(
-      Config config, String contestId, int columnIndex, int rowIndex) async {
+      String contestId, int columnIndex, int rowIndex) async {
     String filePath =
         problemList[curProblem].exampleFileList[columnIndex].inFilePath;
     if (rowIndex == 2) {
@@ -258,7 +258,7 @@ class ProblemModel extends ChangeNotifier {
       'info': [filePath]
     };
     return await Config.dio
-        .post(config.netPath + Config.jsonRequest, data: request)
+        .post(Config.netPath + Config.jsonRequest, data: request)
         .then((value) async {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
@@ -281,9 +281,9 @@ class ProblemModel extends ChangeNotifier {
 
 //  提交代码文件
 //  首先选择文件(应该把config.selectAFile调成静态方法,这样就不必经过GlobalData获取config了)
-  Future<List<String>> selectFile(Config config) async {
+  Future<List<String>> selectFile() async {
     FilePickerResult? filePickerResult =
-        await config.selectAFile(ConstantData.fileSuffix);
+        await Config.selectAFile(ConstantData.fileSuffix);
     if (filePickerResult == null) {
       return [];
     }
@@ -310,12 +310,11 @@ class ProblemModel extends ChangeNotifier {
   }
 
   //0表示提交成功,1表示提交失败
-  Future<bool> submitCodeFile(Config config, String studentNumber,
-      String contestId, List<String> list) async {
+  Future<bool> submitCodeFile(
+      String studentNumber, String contestId, List<String> list) async {
     FormData formData = FormData.fromMap({
       'requestType': 'submitCode',
-      'file': await MultipartFile.fromFile(list[1],
-          filename: list[2]),
+      'file': await MultipartFile.fromFile(list[1], filename: list[2]),
       'contestId': contestId,
       'problemId': problemList[curProblem].problemId,
       'studentNumber': studentNumber,
@@ -323,7 +322,7 @@ class ProblemModel extends ChangeNotifier {
       'submitTime': FuncOne.getCurFormatTime()
     });
     return await Config.dio
-        .post(config.netPath + Config.formRequest, data: formData)
+        .post(Config.netPath + Config.formRequest, data: formData)
         .then((value) {
       return value.data[Config.returnStatus] == Config.succeedStatus;
     }).onError((error, stackTrace) {

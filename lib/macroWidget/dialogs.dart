@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
+import 'package:owo_user/data/rootData.dart';
 import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:bot_toast/bot_toast.dart';
@@ -88,7 +89,7 @@ class MyDialogs {
         ),
         ElevatedButton(
             onPressed: () {
-              ChangeNotifierProvider.of<GlobalData>(context).logout();
+              ChangeNotifierProvider.of<RootData>(context).logout();
               Navigator.pop(context);
             },
             style: ButtonStyle(

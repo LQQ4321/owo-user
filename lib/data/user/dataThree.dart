@@ -117,8 +117,8 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> requestRankData(Config config, String contestId,
-      String studentNumber, String startTime, List<Problem> problemList) async {
+  Future<bool> requestRankData(String contestId, String studentNumber,
+      String startTime, List<Problem> problemList) async {
     if (latestRequestTime != null &&
         DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
       return true;
@@ -129,7 +129,7 @@ class UserModel extends ChangeNotifier {
       'info': [contestId]
     };
     return await Config.dio
-        .post(config.netPath + Config.jsonRequest, data: request)
+        .post(Config.netPath + Config.jsonRequest, data: request)
         .then((value) {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;

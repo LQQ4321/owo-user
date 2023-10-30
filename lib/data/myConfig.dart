@@ -9,6 +9,8 @@ import 'package:file_picker/file_picker.dart';
 class Config {
   //确保全局只有一个Dio实例，节省空间
   static var dio = Dio();
+
+  //静态常量
   static const String jsonRequest = "/studentJson";
   static const String formRequest = "/studentForm";
   static const String managerJsonRequest = "/managerJson";
@@ -17,15 +19,16 @@ class Config {
   static const String succeedStatus = 'succeed';
   static const String failStatus = 'fail';
 
-  late String netPath;
-  late String hostUserName;
+  //静态变量
+  static late String netPath;
+  static late String hostUserName;
 
   //如果不能得到用户名，应该让downloadFilePath为空，这样下载下来的文件应该是跟该程序在同一个目录下(等程序打包成exe后再验证)
   //或者可以将文件默认存放在c盘下,不过这样做有点粗鲁
-  String downloadFilePath = 'C:\\';
+  static String downloadFilePath = 'C:\\';
 
   //根据给定的后缀，选择一个文件
-  Future<FilePickerResult?> selectAFile(List<String> fileType) async {
+  static Future<FilePickerResult?> selectAFile(List<String> fileType) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: fileType,
@@ -36,7 +39,7 @@ class Config {
   }
 
   //获取当前主机的用户名,并放在内存中，以便作为下载路径时使用
-  void setHostUserName() {
+  static void setHostUserName() {
     Platform platform = const LocalPlatform();
     if (platform.isWindows) {
       hostUserName = platform.environment['USERNAME']!;
@@ -45,7 +48,7 @@ class Config {
   }
 
   //打开指定文件夹
-  Future<bool> openFolder(String dirPath) async {
+  static Future<bool> openFolder(String dirPath) async {
     final url = Uri(scheme: 'file', path: dirPath);
     if (await canLaunchUrl(url)) {
       return await launchUrl(url);
@@ -54,7 +57,7 @@ class Config {
   }
 
   //查看指定文件夹是否具有指定文件
-  Future<bool> isExistFile(String dirPath, String filePath) async {
+  static Future<bool> isExistFile(String dirPath, String filePath) async {
     Directory folder = Directory(dirPath);
     if (await folder.exists()) {
       List<FileSystemEntity> files = folder.listSync();
@@ -71,7 +74,7 @@ class Config {
   // 为了赶一下进度，后端的返回情况还是简短一点吧，只需要返回是否登录成功即可，
   // 登录失败的时候是密码错误还是用户id不存在或者是比赛链接错误就不具体判断了
   // 登录成功返回List,失败返回bool
-  Future<dynamic> login(List<String> list, String path) async {
+  static Future<dynamic> login(List<String> list, String path) async {
     netPath = 'http://$path';
     list.add(FuncOne
         .getCurFormatTime()); //应该吧值加到list本身了吧，应该不用list = list.add(element吧)
@@ -93,7 +96,7 @@ class Config {
   }
 
 //  管理员登录
-  Future<bool> managerLogin(List<String> list, String path) async {
+  static Future<bool> managerLogin(List<String> list, String path) async {
     netPath = 'http://$path';
     Map request = {'requestType': 'login', 'info': list};
     return await dio

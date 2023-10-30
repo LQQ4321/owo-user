@@ -34,14 +34,14 @@ class SubmitModel extends ChangeNotifier {
   static const int requestGap = 60 * 3;
   DateTime? latestRequestTime;
 
-  void cleanCacheData(){
+  void cleanCacheData() {
     latestRequestTime = null;
     submitList.clear();
     notifyListeners();
   }
 
-  Future<bool> requestSubmitData(Config config, String contestId,
-      String studentNumber, List<Problem> problemList) async {
+  Future<bool> requestSubmitData(
+      String contestId, String studentNumber, List<Problem> problemList) async {
     if (latestRequestTime != null &&
         DateTime.now().difference(latestRequestTime!).inSeconds < requestGap) {
       return true;
@@ -52,7 +52,7 @@ class SubmitModel extends ChangeNotifier {
       'info': [contestId, studentNumber]
     };
     bool flag = await Config.dio
-        .post(config.netPath + Config.jsonRequest, data: request)
+        .post(Config.netPath + Config.jsonRequest, data: request)
         .then((value) {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
