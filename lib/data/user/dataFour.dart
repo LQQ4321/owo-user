@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dataTwo.dart';
-import 'myConfig.dart';
+import '../myConfig.dart';
 
 class OneSubmit {
   // 这里的应该是题目的顺序编号，如A，B，C这种，

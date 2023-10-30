@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
-import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:bot_toast/bot_toast.dart';
 
@@ -61,11 +61,7 @@ class MyDialogs {
             children: [
               const SizedBox(
                 width: 90,
-                child: ClipOval(
-                  child: Image(
-                    image: AssetImage('assets/images/picture4.jpg'),
-                  ),
-                ),
+                child: Icon(Icons.person_outline)
               ),
               const SizedBox(width: 30),
               Column(

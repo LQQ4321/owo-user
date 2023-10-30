@@ -93,7 +93,15 @@ class Config {
   }
 
 //  管理员登录
-  Future<dynamic> managerLogin() async {
-
+  Future<bool> managerLogin(List<String> list, String path) async {
+    netPath = 'http://$path';
+    Map request = {'requestType': 'login', 'info': list};
+    return await dio
+        .post(netPath + managerJsonRequest, data: request)
+        .then((value) {
+      return value.data[returnStatus] == succeedStatus;
+    }).onError((error, stackTrace) {
+      return false;
+    });
   }
 }

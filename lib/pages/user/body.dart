@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/components/guidance.dart';
-import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
-import 'package:owo_user/pages/home.dart';
-import 'package:owo_user/pages/news.dart';
-import 'package:owo_user/pages/problem.dart';
-import 'package:owo_user/pages/rank.dart';
-import 'package:owo_user/pages/status.dart';
+import 'package:owo_user/pages/user/home.dart';
+import 'package:owo_user/pages/user/news.dart';
+import 'package:owo_user/pages/user/problem.dart';
+import 'package:owo_user/pages/user/rank.dart';
+import 'package:owo_user/pages/user/status.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);

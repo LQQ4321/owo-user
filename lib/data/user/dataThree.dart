@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
 import 'package:owo_user/data/myConfig.dart';
-import 'package:owo_user/data/dataTwo.dart';
+import 'package:owo_user/data/user/dataTwo.dart';
 
 //选手题目状态
 class ProblemStatus {

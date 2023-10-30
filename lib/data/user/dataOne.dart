@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:owo_user/data/dataFive.dart';
-import 'package:owo_user/data/dataFour.dart';
-import 'package:owo_user/data/dataThree.dart';
-import 'package:owo_user/data/dataTwo.dart';
+import 'package:owo_user/data/user/dataFive.dart';
+import 'package:owo_user/data/user/dataFour.dart';
+import 'package:owo_user/data/user/dataThree.dart';
+import 'package:owo_user/data/user/dataTwo.dart';
 import 'package:owo_user/data/myConfig.dart';
 
 //就应该先构建好数据的，搞懂了需要哪些数据以及数据之间的联系，就可以减少重构的次数，设计页面也会比较流畅

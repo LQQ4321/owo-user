@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:owo_user/data/dataFive.dart';
-import 'package:owo_user/data/dataFour.dart';
-import 'package:owo_user/data/dataOne.dart';
-import 'package:owo_user/data/dataThree.dart';
-import 'package:owo_user/data/dataTwo.dart';
+import 'package:owo_user/data/user/dataFive.dart';
+import 'package:owo_user/data/user/dataFour.dart';
+import 'package:owo_user/data/user/dataOne.dart';
+import 'package:owo_user/data/user/dataThree.dart';
+import 'package:owo_user/data/user/dataTwo.dart';
 import 'package:owo_user/data/myProvider.dart';
-import 'package:owo_user/pages/body.dart';
+import 'package:owo_user/pages/user/body.dart';
 import 'package:owo_user/pages/login.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:owo_user/data/manager/dataOne.dart';
+import 'package:owo_user/data/rootData.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,8 +40,12 @@ class _MyAppState extends State<MyApp> {
     GlobalData globalData = GlobalData();
     //调用获取主机用户名方法
     //FIXME 有可能获取不到当前主机的用户名，从而导致下载路径错误
+    //FIXME 得把这个config.setHostUserName()设成静态变量,不然user和manager都得调用一遍
     globalData.config.setHostUserName();
+    MGlobalData mGlobalData = MGlobalData();
+    mGlobalData.config.setHostUserName();
     return ChangeNotifierProvider<GlobalData>(
+        //user
         data: globalData,
         child: ChangeNotifierProvider<ProblemModel>(
             data: globalData.problemModel,
@@ -48,15 +54,30 @@ class _MyAppState extends State<MyApp> {
                 child: ChangeNotifierProvider<NewsModel>(
                     data: globalData.newsModel,
                     child: ChangeNotifierProvider<UserModel>(
-                      data: globalData.userModel,
-                      child: MaterialApp(
-                          debugShowCheckedModeBanner: false,
-                          builder: BotToastInit(),
-                          navigatorObservers: [BotToastNavigatorObserver()],
-                          home: const Scaffold(
-                            body: HomePage(),
-                          )),
-                    )))));
+                        data: globalData.userModel,
+                        child: ChangeNotifierProvider<MGlobalData>(
+                            //manager
+                            data: mGlobalData,
+                            child: ChangeNotifierProvider<RootData>(
+                                //root
+                                data: RootData(),
+                                child: ChangeNotifierProvider<UserModel>(
+                                    data: globalData.userModel,
+                                    child: ChangeNotifierProvider<UserModel>(
+                                        data: globalData.userModel,
+                                        child:
+                                            ChangeNotifierProvider<UserModel>(
+                                          data: globalData.userModel,
+                                          child: MaterialApp(
+                                              debugShowCheckedModeBanner: false,
+                                              builder: BotToastInit(),
+                                              navigatorObservers: [
+                                                BotToastNavigatorObserver()
+                                              ],
+                                              home: const Scaffold(
+                                                body: HomePage(),
+                                              )),
+                                        ))))))))));
   }
 }
 
@@ -65,8 +86,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.of<GlobalData>(context).isLoginSucceed
+    return ChangeNotifierProvider.of<RootData>(context).isLoginSucceed
         ? const Body()
-        : Login();
+        : const Login();
   }
 }

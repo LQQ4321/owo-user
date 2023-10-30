@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
-import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';
 

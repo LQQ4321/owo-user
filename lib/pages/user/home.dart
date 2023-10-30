@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/widgetOne.dart';
 
@@ -48,12 +48,6 @@ class HomeTitle extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        const Opacity(
-          opacity: 0.5,
-          child: Image(
-            image: AssetImage('assets/images/picture5.jpg'),
-          ),
-        ),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -62,7 +56,7 @@ class HomeTitle extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black45,
                   fontSize: 36,
                   fontWeight: FontWeight.w700),
             ),
@@ -70,7 +64,7 @@ class HomeTitle extends StatelessWidget {
             Text(
               '$startTime to $endTime',
               style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black45,
                   fontWeight: FontWeight.w500,
                   fontSize: 15),
             )

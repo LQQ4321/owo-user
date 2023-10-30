@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:owo_user/data/dataThree.dart';
-import 'package:owo_user/data/dataTwo.dart';
+import 'package:owo_user/data/user/dataThree.dart';
+import 'package:owo_user/data/user/dataTwo.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';
 import 'dart:math';

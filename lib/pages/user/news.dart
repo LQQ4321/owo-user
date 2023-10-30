@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:owo_user/data/dataFive.dart';
-import 'package:owo_user/data/dataOne.dart';
+import 'package:owo_user/data/user/dataFive.dart';
+import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
-import 'package:owo_user/data/dataFour.dart';
+import 'package:owo_user/data/user/dataFour.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';
 
