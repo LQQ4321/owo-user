@@ -27,15 +27,58 @@ class ManagerItem {
         isRoot: managerItem['IsRoot'],
         createContestNumber: count);
   }
+
+  @override
+  String toString() {
+    return '$managerName - $password - $isRoot';
+  }
 }
 
 //如果不是超级管理员root的话，没有必要显示这个页面了
 class ManagerModel extends ChangeNotifier {
+  //当前管理员
+  late ManagerItem curManager = ManagerItem(
+      managerName: 'lqq',
+      password: '123456',
+      lastLoginTime: '2023-10-10 10:10:10',
+      isLogin: true,
+      isRoot: false,
+      createContestNumber: 0);
+
+  //所有的管理员(当然啦，只有超级管理员才能查看)
   List<ManagerItem> managerList = [];
 
   void cleanCacheData() {
     managerList.clear();
     notifyListeners();
+  }
+
+  //登录，获取当前用户的信息
+  Future<bool> login(List<String> list, String path) async {
+    dynamic data = await Config.managerLogin(list, path);
+    if (data is bool) {
+      return false;
+    }
+    curManager = ManagerItem.fromJson(data, 0);
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> logout() async {
+    Map request = {
+      'requestType': 'managerOperate',
+      'info': [
+        'logout',
+        curManager.managerName,
+      ]
+    };
+    return await Config.dio
+        .post(Config.netPath + Config.managerJsonRequest, data: request)
+        .then((value) {
+      return value.data[Config.returnStatus] == Config.succeedStatus;
+    }).onError((error, stackTrace) {
+      return false;
+    });
   }
 
   //修改管理员名称或者密码(changeType为true表示修改名称，反之表示修改密码)

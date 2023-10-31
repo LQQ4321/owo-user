@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
+import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/rootData.dart';
 import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
@@ -41,44 +42,107 @@ class MyDialogs {
     }));
   }
 
+  static Future<dynamic> managerStatus(BuildContext context) {
+    return showMyDialog(context, Builder(builder: (context) {
+      String managerName = ChangeNotifierProvider.of<ManagerModel>(context)
+          .curManager
+          .managerName;
+      String password =
+          ChangeNotifierProvider.of<ManagerModel>(context).curManager.password;
+      bool isRoot =
+          ChangeNotifierProvider.of<ManagerModel>(context).curManager.isRoot;
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 350,
+            child: Row(
+              children: [
+                ClipOval(child: Container(
+                  color: Colors.grey,
+                  width: 60,
+                  height: 60,
+                  child: const Icon(Icons.person_outline),
+                )),
+                Expanded(
+                    child: Column(
+                        children: List.generate(2, (index) {
+                  return SizedBox(
+                    height: 30,
+                    width: 260,
+                    child: Text(
+                      index == 0
+                          ? '$managerName  (${isRoot ? 'super admin' : 'general admin'})'
+                          : 'password : $password',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: index == 0 ? Colors.black : Colors.black45,
+                          fontWeight:
+                              index == 0 ? FontWeight.w600 : FontWeight.w400,
+                          fontSize: index == 0 ? 20 : 15),
+                    ),
+                  );
+                })))
+              ],
+            ),
+          ),
+          Container(
+            height: 1,
+            color: Colors.black,
+            margin: const EdgeInsets.all(20),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                ChangeNotifierProvider.of<RootData>(context)
+                    .logout(userModel: 1);
+                Navigator.pop(context);
+              },
+              style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(const Size(350, 50)),
+                  backgroundColor: MaterialStateColor.resolveWith(
+                      (states) => Colors.redAccent)),
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16),
+              ))
+        ],
+      );
+    }),isBarrierDismissible: true);
+  }
+
   //感觉要想页面美观，各个组件之间的距离应该远一些，给人一种游刃有余的感觉
   static Future<dynamic> userStatus(BuildContext context) {
     return showMyDialog(context, Builder(builder: (context) {
       List<String> userInfo = [];
-      userInfo.add(ChangeNotifierProvider
-          .of<GlobalData>(context)
-          .studentName);
+      userInfo.add(ChangeNotifierProvider.of<GlobalData>(context).studentName);
       userInfo
-          .add(ChangeNotifierProvider
-          .of<GlobalData>(context)
-          .studentNumber);
-      userInfo.add(ChangeNotifierProvider
-          .of<GlobalData>(context)
-          .schoolName);
+          .add(ChangeNotifierProvider.of<GlobalData>(context).studentNumber);
+      userInfo.add(ChangeNotifierProvider.of<GlobalData>(context).schoolName);
       return Column(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(
           width: 350,
           child: Row(
             children: [
-              const SizedBox(
-                width: 90,
-                child: Icon(Icons.person_outline)
-              ),
+              const SizedBox(width: 90, child: Icon(Icons.person_outline)),
               const SizedBox(width: 30),
               Column(
                   children: List.generate(userInfo.length, (index) {
-                    return SizedBox(
-                      height: 30,
-                      width: 230,
-                      child: Text(
-                        userInfo[index],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 20),
-                      ),
-                    );
-                  }))
+                return SizedBox(
+                  height: 30,
+                  width: 230,
+                  child: Text(
+                    userInfo[index],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 20),
+                  ),
+                );
+              }))
             ],
           ),
         ),
@@ -95,7 +159,7 @@ class MyDialogs {
             style: ButtonStyle(
                 minimumSize: MaterialStateProperty.all(const Size(350, 50)),
                 backgroundColor: MaterialStateColor.resolveWith(
-                        (states) => Colors.redAccent)),
+                    (states) => Colors.redAccent)),
             child: const Text(
               'Logout',
               style: TextStyle(
@@ -112,9 +176,9 @@ class MyDialogs {
   // 状态，默认是提示，还有失败和成功两种状态,对应的颜色会不一样
   static Future<dynamic> hintMessage(BuildContext context, List<String> texts,
       {int buttonCount = 1,
-        int status = 0,
-        String leftButText = 'CANCEL',
-        String rightButText = 'CONFIRM'}) {
+      int status = 0,
+      String leftButText = 'CANCEL',
+      String rightButText = 'CONFIRM'}) {
     return showMyDialog(context, Builder(builder: (context) {
       return Column(
         //高度尽可能大，宽度取最大的子元素
@@ -134,28 +198,30 @@ class MyDialogs {
                   children: [
                     Padding(
                       padding:
-                      const EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                          const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                       child: ConstantData.infoIcons[status],
                     ),
                     Expanded(
                         child: Text(
-                          texts[0],
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w700),
-                        ))
+                      texts[0],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w700),
+                    ))
                   ],
                 ),
-                Align(alignment: Alignment.centerLeft, child: Text(
-                  '   ${texts[1]}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey),
-                ))
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '   ${texts[1]}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey),
+                    ))
               ],
             ),
           ),
@@ -171,9 +237,9 @@ class MyDialogs {
                 return OutlinedButton(
                     style: ButtonStyle(
                         backgroundColor: MaterialStateColor.resolveWith(
-                                (states) => Colors.blue[100]!),
+                            (states) => Colors.blue[100]!),
                         minimumSize:
-                        MaterialStateProperty.all(const Size(100, 50))),
+                            MaterialStateProperty.all(const Size(100, 50))),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
@@ -189,7 +255,7 @@ class MyDialogs {
               return ElevatedButton(
                   style: ButtonStyle(
                       minimumSize:
-                      MaterialStateProperty.all(const Size(100, 50))),
+                          MaterialStateProperty.all(const Size(100, 50))),
                   onPressed: () {
                     Navigator.pop(context, true);
                   },
@@ -230,25 +296,23 @@ class MyDialogs {
                           borderRadius: BorderRadius.circular(4))),
                   Column(
                       children: List.generate(texts.length, (index) {
-                        return Container(
-                          height: index == 0 ? 30 : 50,
-                          width: 270,
-                          padding: EdgeInsets.only(
-                              top: index == 0 ? 3 : 0,
-                              bottom: index == 0 ? 0 : 3),
-                          child: Text(
-                            texts[index],
-                            maxLines: index == 0 ? 1 : 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: index == 0 ? Colors.black87 : Colors
-                                    .grey,
-                                fontSize: index == 0 ? 18 : 15,
-                                fontWeight:
+                    return Container(
+                      height: index == 0 ? 30 : 50,
+                      width: 270,
+                      padding: EdgeInsets.only(
+                          top: index == 0 ? 3 : 0, bottom: index == 0 ? 0 : 3),
+                      child: Text(
+                        texts[index],
+                        maxLines: index == 0 ? 1 : 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: index == 0 ? Colors.black87 : Colors.grey,
+                            fontSize: index == 0 ? 18 : 15,
+                            fontWeight:
                                 index == 0 ? FontWeight.w500 : FontWeight.w300),
-                          ),
-                        );
-                      }))
+                      ),
+                    );
+                  }))
                 ],
               ));
         },
@@ -264,14 +328,14 @@ class MyDialogs {
         attachedBuilder: (cancel) {
           return Card(
               child: Container(
-                color: Colors.grey[100],
-                padding: const EdgeInsets.all(10),
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.w500),
-                ),
-              ));
+            color: Colors.grey[100],
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              text,
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.w500),
+            ),
+          ));
         });
   }
 }

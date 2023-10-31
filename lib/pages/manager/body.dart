@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:owo_user/components/guidance.dart';
 import 'package:owo_user/data/manager/constData.dart';
+import 'package:owo_user/data/manager/dataOne.dart';
+import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/macroWidget/dialogs.dart';
+import 'package:owo_user/pages/manager/home.dart';
+import 'package:owo_user/pages/manager/managers.dart';
 
 class MBody extends StatelessWidget {
   const MBody({Key? key}) : super(key: key);
@@ -8,12 +15,27 @@ class MBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _LeftGuidance(),
+        const _LeftGuidance(),
         Expanded(
             child: Column(
           children: [
-            _TopTitleBar(),
-            Expanded(child: Container(color: const Color(0xfff7f8fc)))
+            const _TopTitleBar(),
+            Expanded(
+                child: Container(
+              color: const Color(0xfff7f8fc),
+              child: Builder(builder: (context) {
+                int leftButtonId =
+                    ChangeNotifierProvider.of<MGlobalData>(context)
+                        .leftButtonId;
+                if (leftButtonId == 0) {
+                  return const MHome();
+                } else if (leftButtonId == 1) {
+                } else if (leftButtonId == 2) {
+                  return const Managers();
+                }
+                return Container();
+              }),
+            ))
           ],
         ))
       ],
@@ -27,17 +49,92 @@ class _LeftGuidance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int leftBtnId =
+        ChangeNotifierProvider.of<MGlobalData>(context).leftButtonId;
     return Container(
       width: 70,
       color: const Color(0xff063289),
       child: Column(
-          children: List.generate(MConstantData.leftBarIcons.length, (index) {
-        return ElevatedButton(
-          style: ButtonStyle(
-            maximumSize: MaterialStateProperty.all(Size(60, 60))
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            child: ClipOval(
+              child: Card(
+                  color: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  child: InkWell(
+                    splashColor: Colors.green.withAlpha(30),
+                    onTap: () async {
+                      await MyDialogs.managerStatus(context);
+                    },
+                    hoverColor: Colors.black45,
+                    child: const SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Icon(
+                        Icons.person_outline,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )),
+            ),
           ),
-            onPressed: () {}, child: Icon(MConstantData.leftBarIcons[index]));
-      })),
+          Expanded(
+              child: Column(
+                  children: List.generate(MConstantData.leftBarIcons.length - 1,
+                      (index) {
+            return Container(
+              margin: const EdgeInsets.only(top: 20),
+              child: Card(
+                  color: leftBtnId == index
+                      ? const Color(0xff00cd82)
+                      : Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  child: InkWell(
+                    splashColor: Colors.green.withAlpha(30),
+                    onTap: () {
+                      ChangeNotifierProvider.of<MGlobalData>(context)
+                          .switchLeftBtn(index);
+                    },
+                    hoverColor: Colors.black45,
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Icon(
+                        MConstantData.leftBarIcons[index],
+                        color: Colors.white,
+                      ),
+                    ),
+                  )),
+            );
+          }))),
+          Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            child: Card(
+                color: leftBtnId == MConstantData.leftBarIcons.length - 1
+                    ? const Color(0xff00cd82)
+                    : Colors.transparent,
+                shadowColor: Colors.transparent,
+                child: InkWell(
+                  splashColor: Colors.green.withAlpha(30),
+                  onTap: () {
+                    ChangeNotifierProvider.of<MGlobalData>(context)
+                        .switchLeftBtn(MConstantData.leftBarIcons.length - 1);
+                  },
+                  hoverColor: Colors.black45,
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Icon(
+                      MConstantData
+                          .leftBarIcons[MConstantData.leftBarIcons.length - 1],
+                      color: Colors.white,
+                    ),
+                  ),
+                )),
+          )
+        ],
+      ),
     );
   }
 }
@@ -48,6 +145,48 @@ class _TopTitleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 50, color: Colors.white);
+    final String titleText =
+        ChangeNotifierProvider.of<MGlobalData>(context).titleText;
+    return Container(
+      height: 50,
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ClipOval(
+            child: Card(
+              color: Colors.transparent,
+              shadowColor: Colors.transparent,
+              child: InkWell(
+                splashColor: Colors.green.withAlpha(30),
+                hoverColor: Colors.grey[300],
+                highlightColor: Colors.blue,
+                child: const SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(Icons.chevron_left),
+                ),
+                onTap: () {},
+              ),
+            ),
+          ),
+          Expanded(
+              child: MoveWindow(
+                  child: Center(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 50),
+              child: Text(
+                titleText,
+                style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 23),
+              ),
+            ),
+          ))),
+          const WindowButtons(),
+        ],
+      ),
+    );
   }
 }

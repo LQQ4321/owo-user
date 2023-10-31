@@ -7,8 +7,7 @@ class RootData extends ChangeNotifier {
   GlobalData globalData = GlobalData();
   MGlobalData mGlobalData = MGlobalData();
 
-  //TODO 方便调试
-  bool isUser = false;//true; //当前登录的模块
+  bool isUser = true; //当前登录的模块
   bool isLoginSucceed = false; //是否有任意一个模块登录成功
   //实际上这个方法只会被调用一次
   void switchUserModel() {

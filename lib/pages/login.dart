@@ -112,6 +112,7 @@ class _LoginState extends State<Login> {
                     //检查当前是user模式还是manager模式，然后分别调用不同的方法
                     int loginStatus = 0;
                     if (isUser()) {
+                      debugPrint('world');
                       //TODO 为了方便调试，这里先设置好
                       _controllers[0].text = "2007310431";
                       _controllers[1].text = "123456";
@@ -124,6 +125,7 @@ class _LoginState extends State<Login> {
                         _controllers[1].text.trim(),
                       );
                     } else {
+                      debugPrint('hello');
                       //TODO 为了方便调试，这里先设置好
                       _controllers[0].text = "root";
                       _controllers[1].text = "root";
@@ -140,6 +142,7 @@ class _LoginState extends State<Login> {
                             .switchUserModel();
                       }
                     }
+                    debugPrint(loginStatus.toString());
                     if (loginStatus == 0) {
                       ChangeNotifierProvider.of<RootData>(context)
                           .loginSucceed();

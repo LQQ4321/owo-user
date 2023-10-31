@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myConfig.dart';
 
 //将user和manager的数据分开管理,最好就是分别创建两个文件夹，然后都可以用得到的东西就提取出来
 class MGlobalData extends ChangeNotifier {
-  late String managerName;
+  String titleText = 'owo';
 
-  void logout(){
+  //关于导航栏左侧的返回按钮，每个模块都有一个根，不能通过返回按钮从一个根跳到另一个根，
+  // 只能从当前模块的子节点跳到上一步的节点，最多只能跳到当前模块的根
+  int leftButtonId = 0;
 
+  void switchLeftBtn(int index) {
+    if (leftButtonId != index) {
+      leftButtonId = index;
+      notifyListeners();
+    }
+  }
+
+  void changeTitleText(String text) {
+    titleText = text;
+    notifyListeners();
+  }
+
+  ManagerModel managerModel = ManagerModel();
+
+  void logout() {
+    managerModel.logout();
   }
 
 // 记得检查当前的输入数据是否合法
@@ -26,9 +45,7 @@ class MGlobalData extends ChangeNotifier {
       return;
     }
 
-    this.managerName = managerName;
-    if (await Config.managerLogin(
-        [managerName, password], netPath)) {
+    if (!await managerModel.login([managerName, password], netPath)) {
       callBack(2);
     }
   }

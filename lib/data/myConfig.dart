@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:platform/platform.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';
 import 'package:dio/dio.dart';
@@ -96,13 +97,19 @@ class Config {
   }
 
 //  管理员登录
-  static Future<bool> managerLogin(List<String> list, String path) async {
-    netPath = 'http://$path';
-    Map request = {'requestType': 'login', 'info': list};
+  static Future<dynamic> managerLogin(List<String> list, String path) async {
+    netPath = 'http://$path'; //没有哪个界面的数据渲染是需要该数据的，所以这里不需要调用notifyListeners()
+    list.insert(0, 'login');
+    list.add(FuncOne.getCurFormatTime());
+    Map request = {'requestType': 'managerOperate', 'info': list};
     return await dio
         .post(netPath + managerJsonRequest, data: request)
         .then((value) {
-      return value.data[returnStatus] == succeedStatus;
+      if (value.data[returnStatus] != succeedStatus) {
+        return false;
+      }
+      debugPrint(value.data.toString());
+      return value.data['manager'];
     }).onError((error, stackTrace) {
       return false;
     });
