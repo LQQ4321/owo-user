@@ -46,7 +46,15 @@ class ManagerModel extends ChangeNotifier {
       createContestNumber: 0);
 
   //所有的管理员(当然啦，只有超级管理员才能查看)
-  List<ManagerItem> managerList = [];
+  List<ManagerItem> managerList = List.generate(30, (index){
+    return ManagerItem(
+        managerName: 'lqq',
+        password: '123456',
+        lastLoginTime: '2023-10-10 10:10:10',
+        isLogin: index % 3 == 0,
+        isRoot: index % 2 == 0,
+        createContestNumber: 0);
+  });
 
   void cleanCacheData() {
     managerList.clear();
