@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/constData.dart';
 import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/macroWidget/dialogs.dart';
 import 'package:owo_user/macroWidget/widgetTwo.dart';
 
 //管理员界面,如果不是超级管理员，那就没有必要显示该界面
@@ -12,6 +13,8 @@ class Managers extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<ManagerItem> managerList =
         ChangeNotifierProvider.of<ManagerModel>(context).managerList;
+    List<TextEditingController> textEditingControllers =
+        List.generate(2, (index) => TextEditingController());
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
@@ -36,19 +39,51 @@ class Managers extends StatelessWidget {
                       fontSize: 16)),
               ElevatedButton(
                   onPressed: () async {
-                    List<TextEditingController> list =
-                        List.generate(2, (index) => TextEditingController());
-                    bool isRoot = false;
-                    callBack(bool flag) {
-                      isRoot = flag;
+                    int isRoot = 0;
+                    bool isConfirm = false;
+                    callBack(int option) {
+                      isRoot = option;
+                    }
+
+                    callBack2(bool flag) {
+                      isConfirm = flag;
+                    }
+
+                    //在提交表单之前，检查输入的格式是否正确
+                    checkFormal<bool>() {
+                      if (textEditingControllers[0].text.isEmpty ||
+                          textEditingControllers[1].text.isEmpty) {
+                        return false;
+                      }
+                      if (textEditingControllers[0].text.contains(' ') ||
+                          textEditingControllers[1].text.contains(' ')) {
+                        return false;
+                      }
+                      return true;
                     }
 
                     await WidgetTwo.addNewManager(
-                        context, list, ['hello', 'world'], callBack);
-                    if (isRoot) {
-                      debugPrint('root');
+                        context,
+                        textEditingControllers,
+                        [callBack, callBack2, checkFormal]);
+                    if (!isConfirm) {
+                      return;
+                    }
+                    bool flag =
+                        await ChangeNotifierProvider.of<ManagerModel>(context)
+                            .addManager([
+                      textEditingControllers[0].text,
+                      textEditingControllers[1].text,
+                      (isRoot == 1).toString()
+                    ]);
+                    if (flag) {
+                      MyDialogs.oneToast(
+                          ['Operate succeed', 'Add a new manager succeed'],
+                          duration: 5);
                     } else {
-                      debugPrint('normal');
+                      MyDialogs.oneToast(
+                          ['Operate fail', 'Add a new manager fail'],
+                          duration: 5, infoStatus: 2);
                     }
                   },
                   style: ButtonStyle(
@@ -118,12 +153,51 @@ class _ManagerCell extends StatelessWidget {
         return Expanded(
           flex: MConstantData.managerInfoRatio[index],
           child: Builder(builder: (context) {
+            TextEditingController textEditingController =
+                TextEditingController();
+            check<bool>() {
+              if (textEditingController.text.isEmpty ||
+                  textEditingController.text.contains(' ')) {
+                return false;
+              }
+              return true;
+            }
+
+            bool isConfirm = false;
+            callBack(bool flag) {
+              isConfirm = flag;
+            }
+
             if (index < MConstantData.managerInfoRatio.length - 2) {
               return Align(
                 alignment: Alignment.center,
                 child: index < 2
                     ? TextButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          await WidgetTwo.changeSingleData(
+                              context,
+                              ['Change Data', 'name', 'lqq'],
+                              textEditingController,
+                              [callBack, check]);
+                          if (!isConfirm) {
+                            return;
+                          }
+                          bool flag =
+                              await ChangeNotifierProvider.of<ManagerModel>(
+                                      context)
+                                  .changeManagerInfo(managerItem.managerName,
+                                      textEditingController.text, index == 0);
+                          if (flag) {
+                            MyDialogs.oneToast([
+                              'Operate succeed',
+                              'Change info of manager succeed'
+                            ], duration: 5);
+                          } else {
+                            MyDialogs.oneToast(
+                                ['Operate fail', 'Change info of manager fail'],
+                                duration: 5);
+                          }
+                        },
                         child: Text(
                           list[index],
                           style: TextStyle(
@@ -141,32 +215,60 @@ class _ManagerCell extends StatelessWidget {
               );
             } else if (index == MConstantData.managerInfoRatio.length - 2) {
               return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      list[index].split(' ')[1],
-                      style: const TextStyle(
-                          color: Color(0xff1b224e),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700),
-                    ),
-                    Text(
-                      list[index].split(' ')[0],
-                      style: const TextStyle(
-                          color: Color(0xffbabcd1),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
+                child: !list[index].contains(' ')
+                    ? null
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            list[index].split(' ')[1],
+                            style: const TextStyle(
+                                color: Color(0xff1b224e),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            list[index].split(' ')[0],
+                            style: const TextStyle(
+                                color: Color(0xffbabcd1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500),
+                          )
+                        ],
+                      ),
               );
             }
             return managerItem.isRoot
                 ? Container()
                 : Center(
                     child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          await WidgetTwo.confirmInfoDialog(
+                              context,
+                              [
+                                'Delete Operate',
+                                'Are you sure to delete manager ${managerItem.managerName} ?'
+                              ],
+                              callBack);
+                          if (!isConfirm) {
+                            return;
+                          }
+                          bool flag =
+                              await ChangeNotifierProvider.of<ManagerModel>(
+                                      context)
+                                  .deleteManager(managerItem.managerName);
+                          if (flag) {
+                            MyDialogs.oneToast([
+                              'Operate Succeed',
+                              'Administrator ${managerItem.managerName} has been deleted'
+                            ], duration: 5);
+                          } else {
+                            MyDialogs.oneToast([
+                              'Operate Fail',
+                              'Description Failed to delete administrator ${managerItem.managerName}'
+                            ], duration: 5);
+                          }
+                        },
                         style: ButtonStyle(
                             backgroundColor: MaterialStateColor.resolveWith(
                                 (states) => Colors.red)),

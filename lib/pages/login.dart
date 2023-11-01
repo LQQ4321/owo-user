@@ -127,7 +127,9 @@ class _LoginState extends State<Login> {
                     } else {
                       debugPrint('hello');
                       //TODO 为了方便调试，这里先设置好
+                      // _controllers[0].text = "lqq";
                       _controllers[0].text = "root";
+                      // _controllers[1].text = "123456";
                       _controllers[1].text = "root";
                       _controllers[2].text = "175.178.57.154:5051";
                       //这里使用回调函数的方法来等待登录的状态

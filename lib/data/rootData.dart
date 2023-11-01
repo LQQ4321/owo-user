@@ -22,9 +22,9 @@ class RootData extends ChangeNotifier {
   //注销当前用户(管理员或者用户),可以清理一些残留数据
   void logout({int userModel = 0}){
     if(userModel == 0){
-      globalData.logout();
+      // globalData.logout();
     }else{
-      mGlobalData.logout();
+      mGlobalData.cleanCacheData();
     }
     isUser = true;
     isLoginSucceed = false;

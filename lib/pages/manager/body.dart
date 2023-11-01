@@ -3,6 +3,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:owo_user/components/guidance.dart';
 import 'package:owo_user/data/manager/constData.dart';
 import 'package:owo_user/data/manager/dataOne.dart';
+import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
 import 'package:owo_user/pages/manager/home.dart';
@@ -51,6 +52,8 @@ class _LeftGuidance extends StatelessWidget {
   Widget build(BuildContext context) {
     final int leftBtnId =
         ChangeNotifierProvider.of<MGlobalData>(context).leftButtonId;
+    final bool isRoot =
+        ChangeNotifierProvider.of<ManagerModel>(context).curManager.isRoot;
     return Container(
       width: 70,
       color: const Color(0xff063289),
@@ -65,7 +68,14 @@ class _LeftGuidance extends StatelessWidget {
                   child: InkWell(
                     splashColor: Colors.green.withAlpha(30),
                     onTap: () async {
-                      await MyDialogs.managerStatus(context);
+                      String managerName = ChangeNotifierProvider.of<ManagerModel>(context)
+                          .curManager
+                          .managerName;
+                      String password =
+                          ChangeNotifierProvider.of<ManagerModel>(context).curManager.password;
+                      bool isRoot =
+                          ChangeNotifierProvider.of<ManagerModel>(context).curManager.isRoot;
+                      await MyDialogs.managerStatus(context,managerName,password,isRoot);
                     },
                     hoverColor: Colors.black45,
                     child: const SizedBox(
@@ -92,7 +102,7 @@ class _LeftGuidance extends StatelessWidget {
                   shadowColor: Colors.transparent,
                   child: InkWell(
                     splashColor: Colors.green.withAlpha(30),
-                    onTap: () {
+                    onTap: () async {
                       ChangeNotifierProvider.of<MGlobalData>(context)
                           .switchLeftBtn(index);
                     },
@@ -108,31 +118,34 @@ class _LeftGuidance extends StatelessWidget {
                   )),
             );
           }))),
-          Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            child: Card(
-                color: leftBtnId == MConstantData.leftBarIcons.length - 1
-                    ? const Color(0xff00cd82)
-                    : Colors.transparent,
-                shadowColor: Colors.transparent,
-                child: InkWell(
-                  splashColor: Colors.green.withAlpha(30),
-                  onTap: () {
-                    ChangeNotifierProvider.of<MGlobalData>(context)
-                        .switchLeftBtn(MConstantData.leftBarIcons.length - 1);
-                  },
-                  hoverColor: Colors.black45,
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Icon(
-                      MConstantData
-                          .leftBarIcons[MConstantData.leftBarIcons.length - 1],
-                      color: Colors.white,
-                    ),
-                  ),
-                )),
-          )
+          !isRoot
+              ? Container()
+              : Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  child: Card(
+                      color: leftBtnId == MConstantData.leftBarIcons.length - 1
+                          ? const Color(0xff00cd82)
+                          : Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      child: InkWell(
+                        splashColor: Colors.green.withAlpha(30),
+                        onTap: () {
+                          ChangeNotifierProvider.of<MGlobalData>(context)
+                              .switchLeftBtn(
+                                  MConstantData.leftBarIcons.length - 1);
+                        },
+                        hoverColor: Colors.black45,
+                        child: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Icon(
+                            MConstantData.leftBarIcons[
+                                MConstantData.leftBarIcons.length - 1],
+                            color: Colors.white,
+                          ),
+                        ),
+                      )),
+                )
         ],
       ),
     );

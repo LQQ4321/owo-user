@@ -42,15 +42,15 @@ class MyDialogs {
     }));
   }
 
-  static Future<dynamic> managerStatus(BuildContext context) {
+  static Future<dynamic> managerStatus(BuildContext context,String managerName,String password,bool isRoot) {
     return showMyDialog(context, Builder(builder: (context) {
-      String managerName = ChangeNotifierProvider.of<ManagerModel>(context)
-          .curManager
-          .managerName;
-      String password =
-          ChangeNotifierProvider.of<ManagerModel>(context).curManager.password;
-      bool isRoot =
-          ChangeNotifierProvider.of<ManagerModel>(context).curManager.isRoot;
+      // String managerName = ChangeNotifierProvider.of<ManagerModel>(context)
+      //     .curManager
+      //     .managerName;
+      // String password =
+      //     ChangeNotifierProvider.of<ManagerModel>(context).curManager.password;
+      // bool isRoot =
+      //     ChangeNotifierProvider.of<ManagerModel>(context).curManager.isRoot;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [

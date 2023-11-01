@@ -36,27 +36,13 @@ class ManagerItem {
 
 //如果不是超级管理员root的话，没有必要显示这个页面了
 class ManagerModel extends ChangeNotifier {
-  //当前管理员
-  late ManagerItem curManager = ManagerItem(
-      managerName: 'lqq',
-      password: '123456',
-      lastLoginTime: '2023-10-10 10:10:10',
-      isLogin: true,
-      isRoot: false,
-      createContestNumber: 0);
+  late ManagerItem curManager;
 
   //所有的管理员(当然啦，只有超级管理员才能查看)
-  List<ManagerItem> managerList = List.generate(30, (index){
-    return ManagerItem(
-        managerName: 'lqq',
-        password: '123456',
-        lastLoginTime: '2023-10-10 10:10:10',
-        isLogin: index % 3 == 0,
-        isRoot: index % 2 == 0,
-        createContestNumber: 0);
-  });
+  List<ManagerItem> managerList = [];
 
-  void cleanCacheData() {
+  void cleanCacheData() async {
+    await logout();
     managerList.clear();
     notifyListeners();
   }
@@ -85,6 +71,7 @@ class ManagerModel extends ChangeNotifier {
         .then((value) {
       return value.data[Config.returnStatus] == Config.succeedStatus;
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }
@@ -103,8 +90,31 @@ class ManagerModel extends ChangeNotifier {
     return await Config.dio
         .post(Config.netPath + Config.managerJsonRequest, data: request)
         .then((value) {
-      return value.data[Config.returnStatus] == Config.succeedStatus;
+      debugPrint(value.data.toString());
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return false;
+      }
+      for (int i = 0; i < managerList.length; i++) {
+        if (managerList[i].managerName == managerName) {
+          if (changeType) {
+            managerList[i].managerName = newValue;
+          } else {
+            managerList[i].password = newValue;
+          }
+          break;
+        }
+      }
+      if (curManager.managerName == managerName) {
+        if (changeType) {
+          curManager.managerName = newValue;
+        } else {
+          curManager.password = newValue;
+        }
+      }
+      notifyListeners();
+      return true;
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }
@@ -118,8 +128,19 @@ class ManagerModel extends ChangeNotifier {
     return await Config.dio
         .post(Config.netPath + Config.managerJsonRequest, data: request)
         .then((value) {
-      return value.data[Config.returnStatus] == Config.succeedStatus;
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return false;
+      }
+      for (int i = 0; i < managerList.length; i++) {
+        if (managerList[i].managerName == managerName) {
+          managerList.removeAt(i);
+          break;
+        }
+      }
+      notifyListeners();
+      return true;
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }
@@ -131,8 +152,20 @@ class ManagerModel extends ChangeNotifier {
     return await Config.dio
         .post(Config.netPath + Config.managerJsonRequest, data: request)
         .then((value) {
-      return value.data[Config.returnStatus] == Config.succeedStatus;
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return false;
+      }
+      managerList.add(ManagerItem(
+          managerName: list[1],
+          password: list[2],
+          lastLoginTime: '',
+          isLogin: false,
+          isRoot: bool.parse(list[3]),
+          createContestNumber: 0));
+      notifyListeners();
+      return true;
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }
@@ -150,13 +183,14 @@ class ManagerModel extends ChangeNotifier {
         return false;
       }
       List<dynamic> list1 = value.data['managerList'];
-      List<int> list2 = value.data['contestNumber'];
+      List<dynamic> list2 = value.data['contestNumber'];
       managerList = List.generate(list1.length, (index) {
         return ManagerItem.fromJson(list1[index], list2[index]);
       });
       notifyListeners();
       return true;
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }

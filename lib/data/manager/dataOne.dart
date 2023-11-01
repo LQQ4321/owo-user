@@ -10,11 +10,16 @@ class MGlobalData extends ChangeNotifier {
   // 只能从当前模块的子节点跳到上一步的节点，最多只能跳到当前模块的根
   int leftButtonId = 0;
 
-  void switchLeftBtn(int index) {
-    if (leftButtonId != index) {
-      leftButtonId = index;
-      notifyListeners();
+  void switchLeftBtn(int index) async {
+    if (leftButtonId == index) {
+      return;
     }
+    leftButtonId = index;
+    if (leftButtonId == 2) {
+      await managerModel.requestManagers();
+    } else if (leftButtonId == 1) {
+    } else if (leftButtonId == 0) {}
+    notifyListeners();
   }
 
   void changeTitleText(String text) {
@@ -24,8 +29,10 @@ class MGlobalData extends ChangeNotifier {
 
   ManagerModel managerModel = ManagerModel();
 
-  void logout() {
-    managerModel.logout();
+  void cleanCacheData() {
+    leftButtonId = 0;
+    managerModel.cleanCacheData();
+    notifyListeners();
   }
 
 // 记得检查当前的输入数据是否合法

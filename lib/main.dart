@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
                             data: mGlobalData,
                             child: ChangeNotifierProvider<RootData>(
                                 //root
-                                data: RootData(),
+                                data: rootData,
                                 child: ChangeNotifierProvider<ManagerModel>(
                                     data: mGlobalData.managerModel,
                                     child: ChangeNotifierProvider<UserModel>(

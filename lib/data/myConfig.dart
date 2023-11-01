@@ -92,6 +92,7 @@ class Config {
       }
       return false;
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }
@@ -108,9 +109,9 @@ class Config {
       if (value.data[returnStatus] != succeedStatus) {
         return false;
       }
-      debugPrint(value.data.toString());
       return value.data['manager'];
     }).onError((error, stackTrace) {
+      debugPrint(error.toString());
       return false;
     });
   }
