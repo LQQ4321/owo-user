@@ -55,7 +55,7 @@ class WidgetTwo {
   }
 
   //修改单项数据对话框
-  static Future<dynamic> changeSingleData(
+  static Future<dynamic> singleInputDialog(
       BuildContext context,
       List<String> texts,
       TextEditingController textEditingController,
@@ -72,7 +72,7 @@ class WidgetTwo {
                   style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
-                      fontSize: 16)),
+                      fontSize: 18)),
             ),
             Container(
                 color: const Color(0xffe7ecf6),

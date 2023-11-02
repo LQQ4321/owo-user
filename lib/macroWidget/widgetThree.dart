@@ -178,3 +178,70 @@ class _DialogButtonsState extends State<DialogButtons> {
     );
   }
 }
+
+class MyPopupMenu extends StatefulWidget {
+  const MyPopupMenu(
+      {Key? key,
+      required this.list,
+      required this.callBack,
+      this.iconData = Icons.keyboard_arrow_down_sharp})
+      : super(key: key);
+  final List<String> list;
+  final Function(int) callBack;
+  final IconData iconData;
+
+  @override
+  State<MyPopupMenu> createState() => _MyPopupMenuState();
+}
+
+class _MyPopupMenuState extends State<MyPopupMenu> {
+  int _item = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+        initialValue: _item,
+        onSelected: (int item) {
+          setState(() {
+            _item = item;
+          });
+          widget.callBack(item);
+        },
+        tooltip: '',
+        child: Container(
+          height: 30,
+          padding: const EdgeInsets.only(left: 5,right: 5),
+          decoration: BoxDecoration(
+              color: MConstantData.inputFieldColor[2],
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: const [
+                BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(1.0, 1.0),
+                    blurRadius: 2.0)
+              ]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.list[_item],
+                style: TextStyle(
+                    color: MConstantData.inputFieldColor[3],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
+              ),
+              Icon(
+                widget.iconData,
+                color: MConstantData.inputFieldColor[3],
+              )
+            ],
+          ),
+        ),
+        itemBuilder: (BuildContext context) {
+          return List.generate(widget.list.length, (index) {
+            return PopupMenuItem<int>(
+                value: index, child: Text(widget.list[index]));
+          });
+        });
+  }
+}

@@ -174,7 +174,7 @@ class _ManagerCell extends StatelessWidget {
                 child: index < 2
                     ? TextButton(
                         onPressed: () async {
-                          await WidgetTwo.changeSingleData(
+                          await WidgetTwo.singleInputDialog(
                               context,
                               ['Change Data', 'name', 'lqq'],
                               textEditingController,

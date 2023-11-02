@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
+import 'package:owo_user/data/manager/constData.dart';
 import 'package:owo_user/data/user/dataOne.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/funcOne.dart';
@@ -47,7 +48,9 @@ class RatioBar extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          width: (constraints.maxWidth - 10 < 0 ? 0 : constraints.maxWidth - 10) *
+                          width: (constraints.maxWidth - 10 < 0
+                                  ? 0
+                                  : constraints.maxWidth - 10) *
                               (denominator == 0 ? 1 : numerator / denominator),
                           decoration: BoxDecoration(
                             color: Colors.black45,
@@ -91,12 +94,12 @@ class _CountdownTimerState extends State<CountdownTimer> {
     super.initState();
     _seconds =
         DateTime.parse(widget.behindTime).difference(DateTime.now()).inSeconds;
-    if(_seconds < 0 ){
+    if (_seconds < 0) {
       _seconds = 0;
     }
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (_seconds <= 0) {
-        if(ChangeNotifierProvider.of<GlobalData>(context).matchStart){
+        if (ChangeNotifierProvider.of<GlobalData>(context).matchStart) {
           timer.cancel();
         }
         ChangeNotifierProvider.of<GlobalData>(context).setMatchStatus();
@@ -112,7 +115,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
   void didUpdateWidget(_) {
     _seconds =
         DateTime.parse(widget.behindTime).difference(DateTime.now()).inSeconds;
-    if(_seconds < 0) {
+    if (_seconds < 0) {
       _seconds = 0;
     }
   }
@@ -251,6 +254,76 @@ class _RectangleInputState extends State<RectangleInput> {
         ),
       ),
     );
+  }
+}
+
+class FilletCornerInput extends StatefulWidget {
+  const FilletCornerInput(
+      {Key? key,
+      required this.textEditingController,
+      required this.iconData,
+      required this.hintText,
+      required this.callBack})
+      : super(key: key);
+  final IconData iconData;
+  final TextEditingController textEditingController;
+  final String hintText;
+  final Function(String) callBack;
+
+  @override
+  State<FilletCornerInput> createState() => _FilletCornerInputState();
+}
+
+class _FilletCornerInputState extends State<FilletCornerInput> {
+  Color _color = MConstantData.inputFieldColor[2];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: _color),
+          borderRadius: BorderRadius.circular(4),
+          color: MConstantData.inputFieldColor[2]),
+      child: Focus(
+        onFocusChange: (hasFocus) {
+          setState(() {
+            if (hasFocus) {
+              _color = MConstantData
+                  .inputFieldColor[1]; //到底什么情况下Colors.red[200]会是空呢？？？
+            } else {
+              _color = MConstantData.inputFieldColor[2];
+            }
+          });
+        },
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(right: 10, left: 10),
+              child: Icon(widget.iconData),
+            ),
+            Expanded(
+                child: TextField(
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.w600),
+              controller: widget.textEditingController,
+              onSubmitted: (value) {
+                if(value.isNotEmpty){
+                  widget.callBack(value);
+                }
+              },
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                // labelText: widget.labelText,
+                // labelStyle: const TextStyle(color: Colors.grey),
+                hintText: widget.hintText,
+                hintStyle: TextStyle(color: MConstantData.inputFieldColor[3]),
+              ),
+            ))
+          ],
+        ),
+      ),
+    );
+    ;
   }
 }
 

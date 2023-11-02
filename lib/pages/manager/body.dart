@@ -6,6 +6,7 @@ import 'package:owo_user/data/manager/dataOne.dart';
 import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
+import 'package:owo_user/pages/manager/contests.dart';
 import 'package:owo_user/pages/manager/home.dart';
 import 'package:owo_user/pages/manager/managers.dart';
 
@@ -31,6 +32,7 @@ class MBody extends StatelessWidget {
                 if (leftButtonId == 0) {
                   return const MHome();
                 } else if (leftButtonId == 1) {
+                  return const MContests();
                 } else if (leftButtonId == 2) {
                   return const Managers();
                 }
@@ -105,6 +107,7 @@ class _LeftGuidance extends StatelessWidget {
                     onTap: () async {
                       ChangeNotifierProvider.of<MGlobalData>(context)
                           .switchLeftBtn(index);
+
                     },
                     hoverColor: Colors.black45,
                     child: SizedBox(

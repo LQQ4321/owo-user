@@ -1,9 +1,26 @@
 import 'package:flutter/material.dart';
 
 class MConstantData {
-  
-  static const List<Color> inputFieldColor = [Color(0xffd3ddec),Colors.blue];
-  
+  static const List<Color> contestStatusColors = [
+    Colors.grey,
+    Colors.green,
+    Colors.red
+  ];
+
+  static const List<String> filterOptions = [
+    'All',
+    'Not Started',
+    'Under Way',
+    'Ended'
+  ];
+
+  static const List<Color> inputFieldColor = [
+    Color(0xffd3ddec),
+    Colors.blue,
+    Color(0xfff7f8fc),
+    Color(0xff848aac)
+  ];
+
   static const List<IconData> leftBarIcons = [
     Icons.home,
     Icons.emoji_events_outlined,

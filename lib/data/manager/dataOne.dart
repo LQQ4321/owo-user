@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/manager/contests.dart';
 import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myConfig.dart';
+import 'package:owo_user/pages/manager/contests.dart';
 
 //将user和manager的数据分开管理,最好就是分别创建两个文件夹，然后都可以用得到的东西就提取出来
 class MGlobalData extends ChangeNotifier {
@@ -18,6 +20,8 @@ class MGlobalData extends ChangeNotifier {
     if (leftButtonId == 2) {
       await managerModel.requestManagers();
     } else if (leftButtonId == 1) {
+      await contestModel.requestContestList(
+          managerModel.curManager.managerName, managerModel.curManager.isRoot);
     } else if (leftButtonId == 0) {}
     notifyListeners();
   }
@@ -28,6 +32,7 @@ class MGlobalData extends ChangeNotifier {
   }
 
   ManagerModel managerModel = ManagerModel();
+  ContestModel contestModel = ContestModel();
 
   void cleanCacheData() {
     leftButtonId = 0;

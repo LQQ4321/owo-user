@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/data/manager/contests.dart';
 import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myConfig.dart';
 import 'package:owo_user/data/user/dataFive.dart';
@@ -68,8 +69,8 @@ class _MyAppState extends State<MyApp> {
                                 data: rootData,
                                 child: ChangeNotifierProvider<ManagerModel>(
                                     data: mGlobalData.managerModel,
-                                    child: ChangeNotifierProvider<UserModel>(
-                                        data: globalData.userModel,
+                                    child: ChangeNotifierProvider<ContestModel>(
+                                        data: mGlobalData.contestModel,
                                         child:
                                             ChangeNotifierProvider<UserModel>(
                                           data: globalData.userModel,
