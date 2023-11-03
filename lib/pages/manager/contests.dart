@@ -45,16 +45,20 @@ class MContests extends StatelessWidget {
                   child: Row(
                 children: [
                   Expanded(
+                    child: SizedBox(
+                      height: 40,
                       child: FilletCornerInput(
-                    textEditingController: textEditingController,
-                    iconData: Icons.search,
-                    hintText: 'Search a contest',
-                    callBack: (String s) {
-                      ChangeNotifierProvider.of<ContestModel>(context)
-                          .searchContest(s);
-                    },
-                  )),
-                  const SizedBox(width: 80),
+                        textEditingController: textEditingController,
+                        iconData: Icons.search,
+                        hintText: 'Search a contest',
+                        callBack: (String s) {
+                          ChangeNotifierProvider.of<ContestModel>(context)
+                              .searchContest(s);
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 140),
                   SizedBox(
                     width: 120,
                     child: MyPopupMenu(
@@ -178,6 +182,7 @@ class _ContestCell extends StatelessWidget {
                           callBack(bool flag) {
                             isConfirm = flag;
                           }
+
                           check<bool>() {
                             if (textEditingController.text.isEmpty ||
                                 textEditingController.text.contains(' ')) {
@@ -204,12 +209,13 @@ class _ContestCell extends StatelessWidget {
                                   .changeContestInfo(
                                       contestId, 1, textEditingController.text);
                           if (flag) {
-                            MyDialogs.oneToast(
-                                ['Operate succeed', 'Change name of contest succeed'],
-                                duration: 5);
+                            MyDialogs.oneToast([
+                              'Operate succeed',
+                              'Change name of contest succeed'
+                            ], duration: 5);
                           } else {
                             MyDialogs.oneToast(
-                                ['Operate fail', 'change name of contest fail'],
+                                ['Operate fail', 'Change name of contest fail'],
                                 duration: 5, infoStatus: 2);
                           }
                         },
@@ -252,7 +258,57 @@ class _ContestCell extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12)),
                         TextButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              String time = '';
+                              bool isConfirm = false;
+                              check<bool>() {
+                                String startTime = contestItem.startTime;
+                                String endTime = contestItem.endTime;
+                                if (index == 0) {
+                                  startTime = time;
+                                } else {
+                                  endTime = time;
+                                }
+                                return DateTime.parse(startTime)
+                                        .difference(DateTime.parse(endTime))
+                                        .inSeconds <=
+                                    0;
+                              }
+
+                              await WidgetTwo.timeSelectDialog(context, [
+                                index == 0 ? 'Start Time' : 'End Time',
+                                index == 0
+                                    ? contestItem.startTime
+                                    : contestItem.endTime
+                              ], [
+                                (a) {
+                                  time = a + ':00';
+                                },
+                                check,
+                                (a) {
+                                  isConfirm = a;
+                                }
+                              ]);
+                              if (!isConfirm) {
+                                return;
+                              }
+                              bool flag =
+                                  await ChangeNotifierProvider.of<ContestModel>(
+                                          context)
+                                      .changeContestInfo(
+                                          contestId, index + 2, time);
+                              if (flag) {
+                                MyDialogs.oneToast([
+                                  'Operate succeed',
+                                  'Change time of contest succeed'
+                                ], duration: 5);
+                              } else {
+                                MyDialogs.oneToast([
+                                  'Operate fail',
+                                  'Change time of contest fail'
+                                ], duration: 5, infoStatus: 2);
+                              }
+                            },
                             child: Text(
                               index == 0
                                   ? contestItem.startTime
@@ -307,7 +363,34 @@ class _ContestCell extends StatelessWidget {
               children: List.generate(2, (index) {
                 return Center(
                     child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          if (index == 0) {
+                            bool isConfirm = false;
+                            await WidgetTwo.confirmInfoDialog(
+                                context,
+                                [
+                                  'Delete Contest',
+                                  'Are you sure to delete the contest ${contestItem.contestName},all data of the contest will deleted'
+                                ],
+                                (a) => isConfirm = a);
+                            if (isConfirm) {
+                              bool flag =
+                                  await ChangeNotifierProvider.of<ContestModel>(
+                                          context)
+                                      .deleteAContest(contestId);
+                              if (flag) {
+                                MyDialogs.oneToast([
+                                  'Operate succeed',
+                                  'Delete contest succeed'
+                                ], duration: 5);
+                              } else {
+                                MyDialogs.oneToast(
+                                    ['Operate fail', 'Delete contest fail'],
+                                    duration: 5, infoStatus: 2);
+                              }
+                            }
+                          } else if (index == 1) {}
+                        },
                         style: ButtonStyle(
                             backgroundColor: MaterialStateColor.resolveWith(
                                 (states) => index == 0

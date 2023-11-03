@@ -9,6 +9,7 @@ import 'package:owo_user/macroWidget/dialogs.dart';
 import 'package:owo_user/pages/manager/contests.dart';
 import 'package:owo_user/pages/manager/home.dart';
 import 'package:owo_user/pages/manager/managers.dart';
+import 'package:owo_user/pages/manager/singleContest.dart';
 
 class MBody extends StatelessWidget {
   const MBody({Key? key}) : super(key: key);
@@ -30,6 +31,7 @@ class MBody extends StatelessWidget {
                     ChangeNotifierProvider.of<MGlobalData>(context)
                         .leftButtonId;
                 if (leftButtonId == 0) {
+                  return const SingleContest();
                   return const MHome();
                 } else if (leftButtonId == 1) {
                   return const MContests();

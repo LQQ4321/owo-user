@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/contests.dart';
 import 'package:owo_user/data/manager/managers.dart';
+import 'package:owo_user/data/manager/singleContest.dart';
 import 'package:owo_user/data/myConfig.dart';
 import 'package:owo_user/data/user/dataFive.dart';
 import 'package:owo_user/data/user/dataFour.dart';
@@ -17,7 +18,6 @@ import 'package:owo_user/data/manager/dataOne.dart';
 import 'package:owo_user/data/rootData.dart';
 
 void main() {
-
   //调用获取主机用户名方法
   //FIXME 有可能获取不到当前主机的用户名，从而导致下载路径错误
   Config.setHostUserName();
@@ -71,9 +71,9 @@ class _MyAppState extends State<MyApp> {
                                     data: mGlobalData.managerModel,
                                     child: ChangeNotifierProvider<ContestModel>(
                                         data: mGlobalData.contestModel,
-                                        child:
-                                            ChangeNotifierProvider<UserModel>(
-                                          data: globalData.userModel,
+                                        child: ChangeNotifierProvider<
+                                            SingleContestModel>(
+                                          data: mGlobalData.singleContestModel,
                                           child: MaterialApp(
                                               debugShowCheckedModeBanner: false,
                                               builder: BotToastInit(),

@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 
 class MConstantData {
+  static const List<String> fileSuffix = ['zip', 'pdf', 'txt'];
+
+  static const List<Color> fontColor = [Color(0xffc5cad0), Color(0xff2e77ff)];
+
+  static const List<String> contestRoutes = [
+    'Problem',
+    'Status',
+    'Rank',
+    'News',
+    'Users'
+  ];
+
   static const List<Color> contestStatusColors = [
     Colors.grey,
     Colors.green,

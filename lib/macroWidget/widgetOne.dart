@@ -257,6 +257,9 @@ class _RectangleInputState extends State<RectangleInput> {
   }
 }
 
+//一个圆角输入框，左侧可以添加一个图标
+// (输入回车键后，textEditingController的text可能会被清空，
+// 这取决于setState被调用后，textEditingController是否在刷新页面的内部被初始化)
 class FilletCornerInput extends StatefulWidget {
   const FilletCornerInput(
       {Key? key,
@@ -302,23 +305,27 @@ class _FilletCornerInputState extends State<FilletCornerInput> {
               child: Icon(widget.iconData),
             ),
             Expanded(
-                child: TextField(
-              style: const TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.w600),
-              controller: widget.textEditingController,
-              onSubmitted: (value) {
-                if(value.isNotEmpty){
-                  widget.callBack(value);
-                }
-              },
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                // labelText: widget.labelText,
-                // labelStyle: const TextStyle(color: Colors.grey),
-                hintText: widget.hintText,
-                hintStyle: TextStyle(color: MConstantData.inputFieldColor[3]),
-              ),
-            ))
+                child: Padding(
+                  //这里为什么居中不了呀，得添加一点内边距才行
+                  padding: const EdgeInsets.only(bottom: 7),
+                  child: TextField(
+                    style: const TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600),
+                    controller: widget.textEditingController,
+                    onSubmitted: (value) {
+                      if(value.isNotEmpty){
+                        widget.callBack(value);
+                      }
+                    },
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      // labelText: widget.labelText,
+                      // labelStyle: const TextStyle(color: Colors.grey),
+                      hintText: widget.hintText,
+                      hintStyle: TextStyle(color: MConstantData.inputFieldColor[3]),
+                    ),
+                  ),
+                ))
           ],
         ),
       ),

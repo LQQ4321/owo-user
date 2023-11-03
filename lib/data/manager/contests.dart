@@ -63,6 +63,7 @@ class ContestModel extends ChangeNotifier {
   int selectContestId = 0;
 
   void cleanCacheData() {
+    selectContestId = 0;
     contestList.clear();
     showContestList.clear();
   }
@@ -102,6 +103,35 @@ class ContestModel extends ChangeNotifier {
     //之前请求数据的时候就排过一次序了，不用再排序了
     // showContestList.sort((a, b) => a.compare(b));
     notifyListeners();
+  }
+
+  Future<bool> deleteAContest(int contestId) async {
+    Map request = {
+      'requestType': 'deleteAContest',
+      'info': [showContestList[contestId].contestId]
+    };
+    return await Config.dio
+        .post(Config.netPath + Config.managerJsonRequest, data: request)
+        .then((value) {
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return false;
+      }
+      // debugPrint(value.data.toString());
+      //同步本地数据
+      for (int i = 0; i < contestList.length; i++) {
+        if (contestList[i].contestId == showContestList[contestId].contestId) {
+          //在遍历的过程中删除，会不会有影响？
+          contestList.removeAt(i);
+          showContestList.removeAt(contestId);
+          break;
+        }
+      }
+      notifyListeners();
+      return true;
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      return false;
+    });
   }
 
   //改变比赛信息

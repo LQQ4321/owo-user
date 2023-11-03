@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:owo_user/macroWidget/widgetFour.dart';
 import 'package:owo_user/macroWidget/widgetThree.dart';
 
 class WidgetTwo {
@@ -10,6 +11,34 @@ class WidgetTwo {
         builder: (BuildContext context) {
           return AlertDialog(content: widget);
         });
+  }
+
+  static Future<dynamic> timeSelectDialog(
+      BuildContext context, List<String> textList,List<Function> funcList) {
+    return showMyDialog(context, Builder(builder: (context) {
+      return SizedBox(
+        width: 350,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DateTimePicker(text: textList[0],oldTime: textList[1],callBack: funcList[0] as Function(String)),
+            Container(
+                height: 2,
+                color: Colors.grey,
+                margin: const EdgeInsets.only(bottom: 10, top: 10)),
+            DialogButtons(
+              list: const [
+                'CANCEL',
+                'CONFIRM',
+                'Time Error',
+                'Start Time > End Time'
+              ],
+              funcList: funcList.sublist(1),
+            )
+          ],
+        ),
+      );
+    }), isBarrierDismissible: true);
   }
 
   static Future<dynamic> confirmInfoDialog(
@@ -44,9 +73,13 @@ class WidgetTwo {
             ),
             const SizedBox(height: 10),
             DialogButtons(
-              list: const ['CANCEL', 'CONFIRM'],
-              callBack: callBack,
-              check: <bool>() {return true;},
+              list: const ['CANCEL', 'CONFIRM', '', ''],
+              funcList: [
+                <bool>() {
+                  return true;
+                },
+                callBack
+              ],
             )
           ],
         ),
@@ -83,9 +116,13 @@ class WidgetTwo {
                 list: texts.sublist(1)),
             const SizedBox(height: 10),
             DialogButtons(
-              list: const ['CANCEL', 'CONFIRM'],
-              callBack: funcList[0] as Function(bool),
-              check: funcList[1] as Function<bool>(),
+              list: const [
+                'CANCEL',
+                'CONFIRM',
+                'Input Formal Error',
+                'Input text is empty or contains space'
+              ],
+              funcList: funcList,
             )
           ],
         ),
@@ -125,9 +162,13 @@ class WidgetTwo {
                 list: const ['General', 'Super'],
                 callBack: funcList[0] as Function(int)),
             DialogButtons(
-              list: const ['CANCEL', 'CREATE'],
-              callBack: funcList[1] as Function(bool),
-              check: funcList[2] as Function<bool>(),
+              list: const [
+                'CANCEL',
+                'CREATE',
+                'Input Formal Error',
+                'Input text is empty or contains space'
+              ],
+              funcList: funcList,
             )
           ],
         ),

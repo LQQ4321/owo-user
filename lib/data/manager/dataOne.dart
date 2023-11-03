@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/contests.dart';
 import 'package:owo_user/data/manager/managers.dart';
+import 'package:owo_user/data/manager/singleContest.dart';
 import 'package:owo_user/data/myConfig.dart';
 import 'package:owo_user/pages/manager/contests.dart';
 
@@ -33,6 +34,7 @@ class MGlobalData extends ChangeNotifier {
 
   ManagerModel managerModel = ManagerModel();
   ContestModel contestModel = ContestModel();
+  SingleContestModel singleContestModel = SingleContestModel();
 
   void cleanCacheData() {
     leftButtonId = 0;

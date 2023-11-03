@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:owo_user/data/manager/contestRouteData/problems.dart';
+
+//一场比赛的内部数据
+//这里是比赛模块的第二层，展示的页面有 :
+// 1 题目 ：应该有一个题目滚动列表，然后点击相应的列表，出现对应的题目，然后就可以修改题目配置信息了(比赛期间也可能需要修改题目)
+// 2 选手 ：用来操作该场比赛的参赛选手的数据信息
+// 3 消息 ：用来和选手交互的模块
+// 4 提交 ：显示该场比赛所有选手提交的数据
+// 5 排行榜 ：显示该场比赛的排行榜(这里应该单独弄一个页面[为了更好的显示数据])
+// 5.1 关于滚榜功能，还是专门弄一个全屏的页面吧，这样显示起来跟美观
+// 5.2 所以有两个排行榜，一个是局部的，用来显示实时的排行榜信息；一个是全局的，比赛结束后用来滚榜
+// 创建该类的目的是在ContestModel和各个路由之间再加一个中间节点
+// 一是ContestModel已经很臃肿了，二是弄一个专门的节点比较方便管理，缺点就是数树的深度又深了一层
+class SingleContestModel extends ChangeNotifier {
+  MProblemModel mProblemModel = MProblemModel();
+  int routeId = 0;
+
+  //坏处就是存在冗余数据,因为这里是一个为了管理下面的路由的一个中间节点，所以它本身是不应该有数据的，而且这里依赖了上层的数据，
+  //就会导致上层数据更新了，这里也无法获取到.
+  //好处就是下面的路由的各个方法需要上层的数据不用每次都请求一遍,
+  //所以这里的冗余数据的存在原则就是 ：上层不会对该数据更新，下层需要多次使用该数据.
+  late final String contestId;
+
+  //切换路由
+  void switchRouteId(int id) {
+    if (routeId != id) {
+      routeId = id;
+      notifyListeners();
+    }
+  }
+
+//  =================================problem==========================================
+  Future<dynamic> problemOperate(int funcType, int num, String str) async {
+    dynamic flag = false;
+    if (funcType == 0) {
+      mProblemModel.switchProblemId(num);
+    } else if (funcType == 1) {
+      flag = await mProblemModel.requestProblemList(contestId, num, str);
+    } else if (funcType == 2) {
+      flag = await mProblemModel.changeProblemData(contestId, num, str);
+    } else if (funcType == 3) {
+      flag = await mProblemModel.createANewProblem(contestId, str);
+    } else if (funcType == 4) {
+      flag = await mProblemModel.deleteAProblem(contestId);
+    } else if (funcType == 5) {
+      //这里是int类型，应该没事的吧
+      flag = await mProblemModel.uploadFiles(contestId, num);
+    }
+    notifyListeners();
+    return flag;
+  }
+
+//  =================================status==========================================
+
+}

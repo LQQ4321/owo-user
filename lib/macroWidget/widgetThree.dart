@@ -115,15 +115,11 @@ class _SingleCheckState extends State<SingleCheck> {
 }
 
 class DialogButtons extends StatefulWidget {
-  DialogButtons(
-      {Key? key,
-      required this.list,
-      required this.callBack,
-      required this.check})
+  //list包含的数据[前两个按钮的文字，操作失败后的提示信息]
+  DialogButtons({Key? key, required this.list, required this.funcList})
       : super(key: key);
   final List<String> list;
-  Function(bool) callBack;
-  Function<bool>() check;
+  List<Function> funcList;
 
   @override
   State<DialogButtons> createState() => _DialogButtonsState();
@@ -152,16 +148,15 @@ class _DialogButtonsState extends State<DialogButtons> {
                     fontWeight: FontWeight.w600,
                     fontSize: 12),
               )),
-          const SizedBox(width: 30),
+          const SizedBox(width: 20),
           ElevatedButton(
               onPressed: () {
-                if (!widget.check()) {
-                  MyDialogs.oneToast(
-                      ['Formal Error', 'Input Field is empty or contain space'],
+                if (!widget.funcList[0]()) {
+                  MyDialogs.oneToast([widget.list[2], widget.list[3]],
                       infoStatus: 2, duration: 5);
                   return;
                 }
-                widget.callBack(true);
+                widget.funcList[1](true);
                 Navigator.pop(context);
               },
               style: ButtonStyle(
@@ -210,7 +205,7 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
         tooltip: '',
         child: Container(
           height: 30,
-          padding: const EdgeInsets.only(left: 5,right: 5),
+          padding: const EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(
               color: MConstantData.inputFieldColor[2],
               borderRadius: BorderRadius.circular(4),
