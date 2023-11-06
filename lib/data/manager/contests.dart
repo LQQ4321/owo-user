@@ -68,7 +68,10 @@ class ContestModel extends ChangeNotifier {
     showContestList.clear();
   }
 
-  void selectContest(int id) {}
+  void selectContest(int id) {
+    selectContestId = id;
+    notifyListeners();
+  }
 
   //注意，searchContest和filterByOption不能一起使用
   //根据子串来搜索比赛
@@ -222,13 +225,12 @@ class ContestModel extends ChangeNotifier {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
       }
-      // debugPrint(value.data.toString());
+      debugPrint(value.data.toString());
       List<dynamic> tempList = value.data['contestList'];
       contestList = List.generate(tempList.length, (index) {
         return ContestItem.formJson(tempList[index]);
       });
       contestList.sort((a, b) => a.compare(b));
-      // for(int )
       showContestList = [...contestList];
       notifyListeners();
       return true;

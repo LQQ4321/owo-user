@@ -20,7 +20,13 @@ class SingleContestModel extends ChangeNotifier {
   //就会导致上层数据更新了，这里也无法获取到.
   //好处就是下面的路由的各个方法需要上层的数据不用每次都请求一遍,
   //所以这里的冗余数据的存在原则就是 ：上层不会对该数据更新，下层需要多次使用该数据.
-  late final String contestId;
+  //没有页面的更新直接依赖于contestId，所以不需要专门设置一个方法来notifyListeners
+  late String contestId;
+
+  void setContestId(String id) {
+    contestId = id;
+    notifyListeners();
+  }
 
   //切换路由
   void switchRouteId(int id) {
@@ -36,9 +42,9 @@ class SingleContestModel extends ChangeNotifier {
     if (funcType == 0) {
       mProblemModel.switchProblemId(num);
     } else if (funcType == 1) {
-      flag = await mProblemModel.requestProblemList(contestId, num, str);
+      flag = await mProblemModel.requestProblemList(contestId);
     } else if (funcType == 2) {
-      flag = await mProblemModel.changeProblemData(contestId, num, str);
+      // flag = await mProblemModel.changeProblemData(contestId, num, str);
     } else if (funcType == 3) {
       flag = await mProblemModel.createANewProblem(contestId, str);
     } else if (funcType == 4) {
@@ -51,6 +57,10 @@ class SingleContestModel extends ChangeNotifier {
     return flag;
   }
 
+  Future<bool> changeProblemData(List<String> list) async {
+    bool flag = await mProblemModel.changeProblemData(contestId, list);
+    notifyListeners();
+    return flag;
+  }
 //  =================================status==========================================
-
 }

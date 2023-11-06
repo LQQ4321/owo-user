@@ -87,7 +87,7 @@ class WidgetTwo {
     }), isBarrierDismissible: true);
   }
 
-  //修改单项数据对话框
+  //单项数据对话框
   static Future<dynamic> singleInputDialog(
       BuildContext context,
       List<String> texts,

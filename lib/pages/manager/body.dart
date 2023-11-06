@@ -27,16 +27,16 @@ class MBody extends StatelessWidget {
                 child: Container(
               color: const Color(0xfff7f8fc),
               child: Builder(builder: (context) {
-                int leftButtonId =
-                    ChangeNotifierProvider.of<MGlobalData>(context)
-                        .leftButtonId;
-                if (leftButtonId == 0) {
-                  return const SingleContest();
+                int sonPageId =
+                    ChangeNotifierProvider.of<MGlobalData>(context).sonPageId;
+                if (sonPageId == 0) {
                   return const MHome();
-                } else if (leftButtonId == 1) {
+                } else if (sonPageId == 1) {
                   return const MContests();
-                } else if (leftButtonId == 2) {
+                } else if (sonPageId == 2) {
                   return const Managers();
+                } else if (sonPageId == 3) {
+                  return const SingleContest();
                 }
                 return Container();
               }),
@@ -72,14 +72,20 @@ class _LeftGuidance extends StatelessWidget {
                   child: InkWell(
                     splashColor: Colors.green.withAlpha(30),
                     onTap: () async {
-                      String managerName = ChangeNotifierProvider.of<ManagerModel>(context)
-                          .curManager
-                          .managerName;
+                      String managerName =
+                          ChangeNotifierProvider.of<ManagerModel>(context)
+                              .curManager
+                              .managerName;
                       String password =
-                          ChangeNotifierProvider.of<ManagerModel>(context).curManager.password;
+                          ChangeNotifierProvider.of<ManagerModel>(context)
+                              .curManager
+                              .password;
                       bool isRoot =
-                          ChangeNotifierProvider.of<ManagerModel>(context).curManager.isRoot;
-                      await MyDialogs.managerStatus(context,managerName,password,isRoot);
+                          ChangeNotifierProvider.of<ManagerModel>(context)
+                              .curManager
+                              .isRoot;
+                      await MyDialogs.managerStatus(
+                          context, managerName, password, isRoot);
                     },
                     hoverColor: Colors.black45,
                     child: const SizedBox(
@@ -108,8 +114,8 @@ class _LeftGuidance extends StatelessWidget {
                     splashColor: Colors.green.withAlpha(30),
                     onTap: () async {
                       ChangeNotifierProvider.of<MGlobalData>(context)
-                          .switchLeftBtn(index);
-
+                          .pageStatusManager(
+                              option: 1, fatherPageId: index, sonPageId: index);
                     },
                     hoverColor: Colors.black45,
                     child: SizedBox(
@@ -136,8 +142,12 @@ class _LeftGuidance extends StatelessWidget {
                         splashColor: Colors.green.withAlpha(30),
                         onTap: () {
                           ChangeNotifierProvider.of<MGlobalData>(context)
-                              .switchLeftBtn(
-                                  MConstantData.leftBarIcons.length - 1);
+                              .pageStatusManager(
+                                  option: 1,
+                                  fatherPageId:
+                                      MConstantData.leftBarIcons.length - 1,
+                                  sonPageId:
+                                      MConstantData.leftBarIcons.length - 1);
                         },
                         hoverColor: Colors.black45,
                         child: SizedBox(
@@ -184,7 +194,10 @@ class _TopTitleBar extends StatelessWidget {
                   height: 40,
                   child: Icon(Icons.chevron_left),
                 ),
-                onTap: () {},
+                onTap: () {
+                  ChangeNotifierProvider.of<MGlobalData>(context)
+                      .pageStatusManager(option: 0);
+                },
               ),
             ),
           ),

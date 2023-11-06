@@ -10,9 +10,9 @@ import 'package:owo_user/macroWidget/funcOne.dart';
 
 //比例组件
 class RatioBar extends StatelessWidget {
-  const RatioBar({Key? key, required this.numerator, required this.denominator})
+  const RatioBar({Key? key,this.text = 'Through rate', required this.numerator, required this.denominator})
       : super(key: key);
-
+  final String text;
   final int numerator;
   final int denominator;
 
@@ -32,6 +32,11 @@ class RatioBar extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Text(
                       '$numerator / $denominator',
+                      style: const TextStyle(color: Colors.black45),
+                    )),Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      text,
                       style: const TextStyle(color: Colors.black45),
                     ))
               ]),

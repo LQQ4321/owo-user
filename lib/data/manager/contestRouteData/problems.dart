@@ -51,8 +51,8 @@ class MProblemModel {
     }
   }
 
-  Future<bool> requestProblemList(
-      String contestId, int option, String newValue) async {
+  Future<bool> requestProblemList(String contestId) async {
+    problemId = 0;
     Map request = {
       'requestType': 'requestProblemList',
       'info': [contestId]
@@ -74,21 +74,18 @@ class MProblemModel {
       return false;
     });
   }
-
+  //不支持修改题目名称
   Future<bool> changeProblemData(
-      String contestId, int option, String newValue) async {
+      String contestId,List<String> list) async {
     Map request = {
       'requestType': 'changeProblemConfig',
       'info': [
         contestId,
-        problemList[problemId].problemId,
-        problemList[problemId].problemName,
-        problemList[problemId].timeLimit.toString(),
-        problemList[problemId].memoryLimit.toString(),
-        problemList[problemId].maxFileLimit.toString(),
+        problemList[problemId].problemId
       ]
     };
-    request['info'][option + 1] = newValue;
+    (request['info'] as List).addAll(list);
+    debugPrint(request.toString());
     return await Config.dio
         .post(Config.netPath + Config.managerJsonRequest, data: request)
         .then((value) {
@@ -96,15 +93,9 @@ class MProblemModel {
         return false;
       }
       // debugPrint(value.data.toString());
-      if (option == 1) {
-        problemList[problemId].problemName = newValue;
-      } else if (option == 2) {
-        problemList[problemId].timeLimit = int.parse(newValue);
-      } else if (option == 3) {
-        problemList[problemId].memoryLimit = int.parse(newValue);
-      } else if (option == 4) {
-        problemList[problemId].maxFileLimit = int.parse(newValue);
-      }
+      problemList[problemId].timeLimit = int.parse(list[0]);
+      problemList[problemId].memoryLimit = int.parse(list[1]);
+      problemList[problemId].maxFileLimit = int.parse(list[2]);
       return true;
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
@@ -169,7 +160,7 @@ class MProblemModel {
       return 2;
     }
     FormData formData = FormData.fromMap({
-      'requestType': fileType == 0 ? 'uploadIoFiles' : 'uploadIoFiles',
+      'requestType': fileType == 0 ? 'uploadIoFiles' : 'uploadPdfFile',
       'file': await MultipartFile.fromFile(filePickerResult.files.single.path!,
           //FIXME 这里的filename可以不使用本地的文件名吗
           filename: fileType == 0 ? 'io' : 'pdf'),

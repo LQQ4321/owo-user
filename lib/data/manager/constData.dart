@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MConstantData {
+  static const List<String> problemInputText = ['Time Limit / ms','Memory Limit / MB','Max File Limit / KB'];
+
   static const List<String> fileSuffix = ['zip', 'pdf', 'txt'];
 
   static const List<Color> fontColor = [Color(0xffc5cad0), Color(0xff2e77ff)];

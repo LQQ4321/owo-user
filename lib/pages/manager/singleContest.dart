@@ -4,6 +4,7 @@ import 'package:owo_user/data/manager/singleContest.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/pages/manager/contestRoutes/problem.dart';
 
+//它的状态是 3
 class SingleContest extends StatelessWidget {
   const SingleContest({Key? key}) : super(key: key);
 
@@ -73,7 +74,7 @@ class _MidRoute extends StatelessWidget {
                 MConstantData.contestRoutes[index],
                 style: TextStyle(
                     color: MConstantData.fontColor[routeId == index ? 1 : 0],
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w700),
               ),
             ),

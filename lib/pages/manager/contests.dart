@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/constData.dart';
 import 'package:owo_user/data/manager/contests.dart';
+import 'package:owo_user/data/manager/dataOne.dart';
 import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/macroWidget/dialogs.dart';
@@ -93,7 +94,7 @@ class MContests extends StatelessWidget {
                         context,
                         ['Create A Contest', 'Contest Name', 'Contest'],
                         textEditingController,
-                        [callBack, check]);
+                        [check, callBack]);
                     if (!isConfirm) {
                       return;
                     }
@@ -199,7 +200,7 @@ class _ContestCell extends StatelessWidget {
                                 'New Contest Name'
                               ],
                               textEditingController,
-                              [callBack, check]);
+                              [check, callBack]);
                           if (!isConfirm) {
                             return;
                           }
@@ -389,7 +390,13 @@ class _ContestCell extends StatelessWidget {
                                     duration: 5, infoStatus: 2);
                               }
                             }
-                          } else if (index == 1) {}
+                          } else if (index == 1) {
+                            ChangeNotifierProvider.of<ContestModel>(context)
+                                .selectContest(contestId);
+                            ChangeNotifierProvider.of<MGlobalData>(context)
+                                .pageStatusManager(
+                                    option: 1, fatherPageId: 1, sonPageId: 3);
+                          }
                         },
                         style: ButtonStyle(
                             backgroundColor: MaterialStateColor.resolveWith(

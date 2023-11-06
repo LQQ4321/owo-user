@@ -2,28 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/contests.dart';
 import 'package:owo_user/data/manager/managers.dart';
 import 'package:owo_user/data/manager/singleContest.dart';
-import 'package:owo_user/data/myConfig.dart';
-import 'package:owo_user/pages/manager/contests.dart';
 
 //将user和manager的数据分开管理,最好就是分别创建两个文件夹，然后都可以用得到的东西就提取出来
 class MGlobalData extends ChangeNotifier {
+  //程序的总标题栏
   String titleText = 'owo';
 
-  //关于导航栏左侧的返回按钮，每个模块都有一个根，不能通过返回按钮从一个根跳到另一个根，
+  // 关于导航栏左侧的返回按钮，每个模块都有一个根，不能通过返回按钮从一个根跳到另一个根，
   // 只能从当前模块的子节点跳到上一步的节点，最多只能跳到当前模块的根
+  //表示主页面的模块，只表示根节点
   int leftButtonId = 0;
 
-  void switchLeftBtn(int index) async {
-    if (leftButtonId == index) {
-      return;
+  //表示子节点
+  int sonPageId = 0;
+
+  //创建一个二维数组，第一维表示根页面节点，第二维表示页面子节点
+  List<List<int>> pageStatus = List.generate(3, (index) {
+    return [index];
+  });
+
+  //第一个参数是操作类型 0 表示返回上一步,1 表示切换页面
+  void pageStatusManager(
+      {required int option, int fatherPageId = 0, int sonPageId = 0}) async {
+    if (option == 0) {
+      if (pageStatus[leftButtonId].length == 1) {
+        return;
+      } else {
+        pageStatus[leftButtonId].removeLast();
+        this.sonPageId = pageStatus[leftButtonId].last;
+      }
+    } else if (option == 1) {
+      if (leftButtonId == fatherPageId) {
+        if (pageStatus[leftButtonId].last == sonPageId ||
+            sonPageId == fatherPageId) {
+          return;
+        } else {
+          pageStatus[leftButtonId].add(sonPageId);
+          this.sonPageId = sonPageId;
+          if (sonPageId == 3) {
+            singleContestModel.setContestId(contestModel
+                .showContestList[contestModel.selectContestId].contestId);
+            await singleContestModel.problemOperate(1, 0, '');
+          }
+        }
+      } else {
+        leftButtonId = fatherPageId;
+        this.sonPageId = sonPageId > pageStatus[leftButtonId].last
+            ? sonPageId
+            : pageStatus[leftButtonId].last;
+        if (leftButtonId == 2) {
+          await managerModel.requestManagers();
+        } else if (leftButtonId == 1) {
+          await contestModel.requestContestList(
+              managerModel.curManager.managerName,
+              managerModel.curManager.isRoot);
+        }
+      }
     }
-    leftButtonId = index;
-    if (leftButtonId == 2) {
-      await managerModel.requestManagers();
-    } else if (leftButtonId == 1) {
-      await contestModel.requestContestList(
-          managerModel.curManager.managerName, managerModel.curManager.isRoot);
-    } else if (leftButtonId == 0) {}
     notifyListeners();
   }
 
