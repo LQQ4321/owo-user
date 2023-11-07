@@ -225,7 +225,7 @@ class ContestModel extends ChangeNotifier {
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
       }
-      debugPrint(value.data.toString());
+      // debugPrint(value.data.toString());
       List<dynamic> tempList = value.data['contestList'];
       contestList = List.generate(tempList.length, (index) {
         return ContestItem.formJson(tempList[index]);

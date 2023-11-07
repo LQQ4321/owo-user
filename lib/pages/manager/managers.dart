@@ -11,8 +11,8 @@ class Managers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<ManagerItem> managerList =
-        ChangeNotifierProvider.of<ManagerModel>(context).managerList;
+    final int managerLength =
+        ChangeNotifierProvider.of<ManagerModel>(context).managerList.length;
     List<TextEditingController> textEditingControllers =
         List.generate(2, (index) => TextEditingController());
     return Container(
@@ -118,7 +118,7 @@ class Managers extends StatelessWidget {
           Container(height: 1, color: const Color(0xff4454a1)),
           Expanded(
               child: ListView.builder(
-                  itemCount: managerList.length,
+                  itemCount: managerLength,
                   itemExtent: 60,
                   itemBuilder: (BuildContext context, int index) {
                     return Container(

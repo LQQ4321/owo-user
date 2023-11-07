@@ -10,7 +10,11 @@ import 'package:owo_user/macroWidget/funcOne.dart';
 
 //比例组件
 class RatioBar extends StatelessWidget {
-  const RatioBar({Key? key,this.text = 'Through rate', required this.numerator, required this.denominator})
+  const RatioBar(
+      {Key? key,
+      this.text = 'Through rate',
+      required this.numerator,
+      required this.denominator})
       : super(key: key);
   final String text;
   final int numerator;
@@ -33,7 +37,8 @@ class RatioBar extends StatelessWidget {
                     child: Text(
                       '$numerator / $denominator',
                       style: const TextStyle(color: Colors.black45),
-                    )),Align(
+                    )),
+                Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       text,
@@ -311,26 +316,29 @@ class _FilletCornerInputState extends State<FilletCornerInput> {
             ),
             Expanded(
                 child: Padding(
-                  //这里为什么居中不了呀，得添加一点内边距才行
-                  padding: const EdgeInsets.only(bottom: 7),
-                  child: TextField(
-                    style: const TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.w600),
-                    controller: widget.textEditingController,
-                    onSubmitted: (value) {
-                      if(value.isNotEmpty){
-                        widget.callBack(value);
-                      }
-                    },
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      // labelText: widget.labelText,
-                      // labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: widget.hintText,
-                      hintStyle: TextStyle(color: MConstantData.inputFieldColor[3]),
-                    ),
-                  ),
-                ))
+              //这里为什么居中不了呀，得添加一点内边距才行
+              padding: const EdgeInsets.only(bottom: 7),
+              child: TextField(
+                style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600),
+                controller: widget.textEditingController,
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    widget.callBack(value);
+                  }
+                },
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  //如果输入内容为空，就显示提示信息，反之显示输入内容
+                  hintText: widget.textEditingController.text.isEmpty
+                      ? widget.hintText
+                      : widget.textEditingController.text,
+                  hintStyle: TextStyle(color: MConstantData.inputFieldColor[3]),
+                ),
+              ),
+            ))
           ],
         ),
       ),

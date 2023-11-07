@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/contestRouteData/problems.dart';
+import 'package:owo_user/data/manager/contestRouteData/status.dart';
 
 //一场比赛的内部数据
 //这里是比赛模块的第二层，展示的页面有 :
@@ -14,6 +15,7 @@ import 'package:owo_user/data/manager/contestRouteData/problems.dart';
 // 一是ContestModel已经很臃肿了，二是弄一个专门的节点比较方便管理，缺点就是数树的深度又深了一层
 class SingleContestModel extends ChangeNotifier {
   MProblemModel mProblemModel = MProblemModel();
+  Status status = Status();
   int routeId = 0;
 
   //坏处就是存在冗余数据,因为这里是一个为了管理下面的路由的一个中间节点，所以它本身是不应该有数据的，而且这里依赖了上层的数据，
@@ -29,9 +31,12 @@ class SingleContestModel extends ChangeNotifier {
   }
 
   //切换路由
-  void switchRouteId(int id) {
+  Future<void> switchRouteId(int id) async {
     if (routeId != id) {
       routeId = id;
+      if (routeId == 1) {
+        await statusOperate(false);
+      }
       notifyListeners();
     }
   }
@@ -62,5 +67,28 @@ class SingleContestModel extends ChangeNotifier {
     notifyListeners();
     return flag;
   }
+
 //  =================================status==========================================
+
+  Future<bool> statusOperate(bool refresh) async {
+    List<String> list =
+        List.generate(mProblemModel.problemList.length, (index) {
+      return mProblemModel.problemList[index].problemId;
+    });
+    bool flag = await status.requestSubmitsInfo(contestId, refresh, list);
+    notifyListeners();
+    return flag;
+  }
+  //FIXME 该方法的正确性未测试
+  Future<bool> statusDownloadCodeFile(int showStatusId) async {
+    bool flag = await status.downloadCodeFile(contestId, showStatusId);
+    notifyListeners();
+    return flag;
+  }
+
+  void statusFilter({int option = 0}) {
+    status.filter(option);
+    notifyListeners();
+  }
+
 }

@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
 
 class MConstantData {
-  static const List<String> problemInputText = ['Time Limit / ms','Memory Limit / MB','Max File Limit / KB'];
+  static const List<String> submitInfo = [
+    'When',
+    'Author',
+    'Status',
+    'Problem',
+    'Time',
+    'Memory',
+    'Language',
+    'Size',
+    'Download'
+  ];
+
+  static const List<int> submitInfoFlex = [1, 3, 1, 1, 1, 1, 1, 1, 1];
+
+  static const List<String> problemInputText = [
+    'Time Limit / ms',
+    'Memory Limit / MB',
+    'Max File Limit / KB'
+  ];
 
   static const List<String> fileSuffix = ['zip', 'pdf', 'txt'];
 

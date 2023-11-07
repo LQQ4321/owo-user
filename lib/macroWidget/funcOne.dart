@@ -4,6 +4,24 @@ import 'dart:math';
 
 //一个包含多个静态方法的函数类，主要是为了处理数据
 class FuncOne {
+  static const List<List<String>> languageList = [
+    ['c++', 'cpp'],
+    ['c', 'c'],
+    ['golang', 'go'],
+    ['java', 'java'],
+    ['python3', 'py']
+  ];
+
+  //根据语言类型，获取对应的文件后缀
+  static String getFileSuffix(String language) {
+    for(int i = 0;i < languageList.length;i++){
+      if(languageList[i][0] == language){
+        return language[i][1];
+      }
+    }
+    return 'ErrorFile';
+  }
+
   //生成一个指定长度的随机字符串
   static String generateRandomString(int length) {
     String result = '';

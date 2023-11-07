@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/constData.dart';
+import 'package:owo_user/data/manager/contests.dart';
 import 'package:owo_user/data/manager/singleContest.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/pages/manager/contestRoutes/problem.dart';
+import 'package:owo_user/pages/manager/contestRoutes/status.dart';
 
 //它的状态是 3
 class SingleContest extends StatelessWidget {
@@ -33,6 +35,8 @@ class SingleContest extends StatelessWidget {
                 ChangeNotifierProvider.of<SingleContestModel>(context).routeId;
             if (routeId == 0) {
               return const ProblemRoute();
+            } else if (routeId == 1) {
+              return const MStatus();
             }
             return Container();
           })),
@@ -66,8 +70,8 @@ class _MidRoute extends StatelessWidget {
                             : Colors.transparent,
                         width: 4.0))),
             child: TextButton(
-              onPressed: () {
-                ChangeNotifierProvider.of<SingleContestModel>(context)
+              onPressed: () async {
+                await ChangeNotifierProvider.of<SingleContestModel>(context)
                     .switchRouteId(index);
               },
               child: Text(
@@ -91,11 +95,15 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String contestName = ChangeNotifierProvider.of<ContestModel>(context)
+        .showContestList[
+            ChangeNotifierProvider.of<ContestModel>(context).selectContestId]
+        .contestName;
     return Row(
       children: [
         SizedBox(
           width: 300,
-          child: Text('广西大学第一届校赛',
+          child: Text(contestName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
