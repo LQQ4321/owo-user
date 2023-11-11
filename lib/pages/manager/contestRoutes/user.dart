@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/constData.dart';
 import 'package:owo_user/data/manager/contestRouteData/user.dart';
+import 'package:owo_user/data/manager/dataOne.dart';
 import 'package:owo_user/data/manager/singleContest.dart';
 import 'package:owo_user/data/myProvider.dart';
+import 'package:owo_user/macroWidget/dialogs.dart';
+import 'package:owo_user/macroWidget/myDialogs/user.dart';
 import 'package:owo_user/macroWidget/widgetOne.dart';
+import 'package:owo_user/macroWidget/widgetTwo.dart';
 
 class MUserRoute extends StatelessWidget {
   const MUserRoute({Key? key}) : super(key: key);
@@ -116,7 +120,61 @@ class _UserCell extends StatelessWidget {
                             child: Container(
                           padding: const EdgeInsets.all(5),
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              List<TextEditingController> controllers =
+                                  List.generate(
+                                      2, (index) => TextEditingController());
+                              bool isConfirm = false;
+                              await MyUserDialogs.multiInput(
+                                  context,
+                                  'Change Info',
+                                  ['Student Name', 'School Name'],
+                                  ['', ''],
+                                  controllers,
+                                  [
+                                    () {
+                                      return true;
+                                    },
+                                    (a) {
+                                      isConfirm = a;
+                                    }
+                                  ]);
+                              if (!isConfirm) {
+                                return;
+                              }
+                              String oneText = mUserItem.studentName;
+                              String twoText = mUserItem.schoolName;
+                              if (controllers[0].text.isNotEmpty) {
+                                oneText = controllers[0].text;
+                              }
+                              if (controllers[1].text.isNotEmpty) {
+                                twoText = controllers[1].text;
+                              }
+                              if (controllers[0].text.isEmpty &&
+                                  controllers[1].text.isEmpty) {
+                                return;
+                              }
+                              bool flag = await ChangeNotifierProvider.of<
+                                      SingleContestModel>(context)
+                                  .userOperate(3, [
+                                0,
+                                mUserItem.userId,
+                                oneText,
+                                twoText,
+                                mUserItem.studentNumber,
+                                mUserItem.password
+                              ]);
+                              if (flag) {
+                                MyDialogs.oneToast([
+                                  'Operate succeed',
+                                  'Change user info succeed'
+                                ], duration: 5);
+                              } else {
+                                MyDialogs.oneToast(
+                                    ['Operate fail', 'Change user info fail'],
+                                    duration: 5, infoStatus: 2);
+                              }
+                            },
                             child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Column(
@@ -150,7 +208,60 @@ class _UserCell extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          List<TextEditingController> controllers =
+                              List.generate(
+                                  2, (index) => TextEditingController());
+                          bool isConfirm = false;
+                          await MyUserDialogs.multiInput(
+                              context,
+                              'Change Info',
+                              ['Student Number', 'Password'],
+                              ['', ''],
+                              controllers,
+                              [
+                                () {
+                                  return true;
+                                },
+                                (a) {
+                                  isConfirm = a;
+                                }
+                              ]);
+                          if (!isConfirm) {
+                            return;
+                          }
+                          String oneText = mUserItem.studentNumber;
+                          String twoText = mUserItem.password;
+                          if (controllers[0].text.isNotEmpty) {
+                            oneText = controllers[0].text;
+                          }
+                          if (controllers[1].text.isNotEmpty) {
+                            twoText = controllers[1].text;
+                          }
+                          if (controllers[0].text.isEmpty &&
+                              controllers[1].text.isEmpty) {
+                            return;
+                          }
+                          bool flag = await ChangeNotifierProvider.of<
+                                  SingleContestModel>(context)
+                              .userOperate(3, [
+                            0,
+                            mUserItem.userId,
+                            mUserItem.studentName,
+                            mUserItem.schoolName,
+                            oneText,
+                            twoText
+                          ]);
+                          if (flag) {
+                            MyDialogs.oneToast(
+                                ['Operate succeed', 'Change user info succeed'],
+                                duration: 5);
+                          } else {
+                            MyDialogs.oneToast(
+                                ['Operate fail', 'Change user info fail'],
+                                duration: 5, infoStatus: 2);
+                          }
+                        },
                         child: Align(
                             alignment: Alignment.centerLeft,
                             child: Column(
@@ -226,7 +337,31 @@ class _UserCell extends StatelessWidget {
                     flex: MConstantData.userInfoRatio[3],
                     child: Center(
                       child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            bool isConfirm = false;
+                            await WidgetTwo.confirmInfoDialog(
+                                context,
+                                [
+                                  'Delete user',
+                                  'Are you sure about deleting user ${mUserItem.studentName}'
+                                ],
+                                (a) => isConfirm = a);
+                            if (!isConfirm) {
+                              return;
+                            }
+                            bool flag = await ChangeNotifierProvider.of<
+                                    SingleContestModel>(context)
+                                .userOperate(3, [1, mUserItem.userId]);
+                            if (flag) {
+                              MyDialogs.oneToast(
+                                  ['Operate succeed', 'Delete user succeed'],
+                                  duration: 5);
+                            } else {
+                              MyDialogs.oneToast(
+                                  ['Operate fail', 'Delete user fail'],
+                                  duration: 5, infoStatus: 2);
+                            }
+                          },
                           style: ButtonStyle(
                               minimumSize: MaterialStateProperty.resolveWith(
                                   (states) => const Size(50, 35)),
@@ -269,8 +404,8 @@ class _TopBar extends StatelessWidget {
               iconData: Icons.search,
               hintText: 'Search User',
               callBack: (a) {
-                // ChangeNotifierProvider.of<SingleContestModel>(context)
-                //     .userOperate(1, []);
+                ChangeNotifierProvider.of<SingleContestModel>(context)
+                    .userOperate(2, []);
               }),
         ),
         Row(
@@ -280,9 +415,81 @@ class _TopBar extends StatelessWidget {
               return const SizedBox(width: 10);
             }
             return ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (index == 0) {
-                  } else if (index == 2) {}
+                    List<TextEditingController> controllers =
+                        List.generate(4, (index) => TextEditingController());
+                    bool isConfirm = false;
+                    await MyUserDialogs.multiInput(
+                        context,
+                        'Add A New User',
+                        [
+                          'Student Name',
+                          'School Name',
+                          'Student Number',
+                          'Password'
+                        ],
+                        ['', '', '', ''],
+                        controllers,
+                        [
+                          () {
+                            for (int i = 0; i < controllers.length; i++) {
+                              if (controllers[i].text.isEmpty ||
+                                  controllers[i].text.contains(' ')) {
+                                return false;
+                              }
+                            }
+                            return true;
+                          },
+                          (a) {
+                            isConfirm = a;
+                          }
+                        ]);
+                    if (!isConfirm) {
+                      return;
+                    }
+                    List<String> tempList = [];
+                    for (int i = 0; i < controllers.length; i++) {
+                      tempList.add(controllers[i].text);
+                    }
+                    bool flag =
+                        await ChangeNotifierProvider.of<SingleContestModel>(
+                                context)
+                            .userOperate(3, [2, ...tempList]);
+                    if (flag) {
+                      MyDialogs.oneToast(
+                          ['Operate succeed', 'Add user succeed'],
+                          duration: 5);
+                    } else {
+                      MyDialogs.oneToast(['Operate fail', 'Add user fail'],
+                          duration: 5, infoStatus: 2);
+                    }
+                  } else if (index == 2) {
+                    bool isConfirm = false;
+                    await WidgetTwo.confirmInfoDialog(
+                        context,
+                        [
+                          'Danger Operate',
+                          'This operation will delete all previous player data,are you sure to cintinue ?'
+                        ],
+                        (a) => isConfirm = a);
+                    if (!isConfirm) {
+                      return;
+                    }
+                    int flag =
+                        await ChangeNotifierProvider.of<SingleContestModel>(
+                                context)
+                            .userOperate(4, []);
+                    if (flag == 0) {
+                      MyDialogs.oneToast(
+                          ['Operate succeed', 'Upload white list succeed'],
+                          duration: 5);
+                    } else if (flag == 2) {
+                      MyDialogs.oneToast(
+                          ['Operate fail', 'Upload white list fail'],
+                          duration: 5, infoStatus: 2);
+                    }
+                  }
                 },
                 style: ButtonStyle(
                     minimumSize: MaterialStateProperty.resolveWith(

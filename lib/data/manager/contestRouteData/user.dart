@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/constData.dart';
 import 'package:owo_user/data/myConfig.dart';
-
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 //rank和user路由一起使用,滚榜使用的数据是和status页面共享的
 
 class MProblemStatus {
@@ -148,18 +149,96 @@ class MUser {
   }
 
   //{studentName,schoolName},{studentNumber,password}
-  Future<bool> changeUserInfo(
-      String contestId, int userId, List<String> val) async {
-    Map request = {
-      'requestType': 'changeUserInfo',
-      'info': [contestId]
-    };
+  //val里面的userId是数据库中的主键，而不是userList的索引
+  Future<bool> userOperate(String contestId, int option, List<String> val,
+      {List<String>? problem}) async {
+    String reqOption = 'changeUserInfo';
+    if (option == 1) {
+      reqOption = 'deleteAUser';
+    } else if (option == 2) {
+      reqOption = 'createAUser';
+    }
+    List<String> tempList = [reqOption, contestId];
+    tempList.addAll(val);
+    Map request = {'requestType': 'userOperate', 'info': tempList};
+    debugPrint(request.toString());
     return await Config.dio
         .post(Config.netPath + Config.managerJsonRequest, data: request)
         .then((value) {
-      // debugPrint(value.data.toString());
+      debugPrint(value.data.toString());
       if (value.data[Config.returnStatus] != Config.succeedStatus) {
         return false;
+      }
+      if (option == 0) {
+        for (int i = 0; i < allUserList.length; i++) {
+          if (allUserList[i].userId == val[0]) {
+            allUserList[i].studentName = val[1];
+            allUserList[i].schoolName = val[2];
+            allUserList[i].studentNumber = val[3];
+            allUserList[i].password = val[4];
+            break;
+          }
+        }
+        for (int i = 0; i < rankList.length; i++) {
+          if (rankList[i].userId == val[0]) {
+            rankList[i].studentName = val[1];
+            rankList[i].schoolName = val[2];
+            rankList[i].studentNumber = val[3];
+            rankList[i].password = val[4];
+            break;
+          }
+        }
+        for (int i = 0; i < rankList.length; i++) {
+          if (userList[i].userId == val[0]) {
+            userList[i].studentName = val[1];
+            userList[i].schoolName = val[2];
+            userList[i].studentNumber = val[3];
+            userList[i].password = val[4];
+            break;
+          }
+        }
+      } else if (option == 1) {
+        for (int i = 0; i < allUserList.length; i++) {
+          if (allUserList[i].userId == val[0]) {
+            allUserList.removeAt(i);
+            break;
+          }
+        }
+        for (int i = 0; i < rankList.length; i++) {
+          if (rankList[i].userId == val[0]) {
+            rankList.removeAt(i);
+            break;
+          }
+        }
+        for (int i = 0; i < userList.length; i++) {
+          if (userList[i].userId == val[0]) {
+            userList.removeAt(i);
+            break;
+          }
+        }
+      } else if (option == 2) {
+        int userId = value.data['userId'];
+        Map tempData = {
+          'ID': userId,
+          'LoginTime': '',
+          'StudentName': val[0],
+          'SchoolName': val[1],
+          'StudentNumber': val[2],
+          'Password': val[3],
+          'Status': '',
+        };
+        allUserList.add(MUserItem.fromJson(tempData, problem!, ''));
+        userList.insert(0, MUserItem.fromJson(tempData, problem!, ''));
+        if (allUserList.length > 1) {
+          if (allUserList[allUserList.length - 1]
+                  .compare(allUserList[allUserList.length - 2]) ==
+              0) {
+            allUserList[allUserList.length - 1].rankId =
+                allUserList[allUserList.length - 2].rankId;
+          } else {
+            allUserList[allUserList.length - 1].rankId = allUserList.length;
+          }
+        }
       }
       return true;
     }).onError((error, stackTrace) {
@@ -199,9 +278,6 @@ class MUser {
         } else {
           allUserList[i].rankId = i + 1;
         }
-        if(i % 5 == 0){
-          allUserList[i].loginTime = '';
-        }
       }
       //将总数据拷贝到两个页面中，方便使用
       rankList = [...allUserList];
@@ -210,6 +286,37 @@ class MUser {
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       return false;
+    });
+  }
+
+  //因为状态比较多，所以还是用int来代替bool吧
+  //0 上传文件成功,1 没有执行上传操作, 2 上传失败
+  Future<int> addUsersFromFile(String contestId) async {
+    FilePickerResult? filePickerResult = await Config.selectAFile(['txt']);
+    if (filePickerResult == null) {
+      return 1;
+    }
+    //比较的单位是 kb (即使测试文件压缩成zip文件，也还是会很大，所以后端文件传输的限制要开大一些，或者使用其他文件传输的方法)
+    if ((filePickerResult.files.single.size >> 10) > (1 << 10)) {
+      return 2;
+    }
+    FormData formData = FormData.fromMap({
+      'requestType': 'addUsersFromFile',
+      'file': await MultipartFile.fromFile(filePickerResult.files.single.path!,
+          //FIXME 这里的filename可以不使用本地的文件名吗
+          filename: 'whiteList.txt'),
+      'contestId': contestId,
+    });
+    return await Config.dio
+        .post(Config.netPath + Config.managerFormRequest, data: formData)
+        .then((value) {
+      if (value.data[Config.returnStatus] != Config.succeedStatus) {
+        return 2;
+      }
+      return 0;
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      return 2;
     });
   }
 }

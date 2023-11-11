@@ -39,7 +39,7 @@ class SingleContestModel extends ChangeNotifier {
       if (routeId == 1) {
         await statusOperate(false);
       } else if (routeId == 2 || routeId == 4) {
-        await userOperate(0, [false,startTime]);
+        await userOperate(0, [false, startTime]);
       }
       notifyListeners();
     }
@@ -97,8 +97,8 @@ class SingleContestModel extends ChangeNotifier {
   }
 
 //  =================================user==========================================
-  Future<bool> userOperate(int funcType, List<dynamic> args) async {
-    bool flag = false;
+  Future<dynamic> userOperate(int funcType, List<dynamic> args) async {
+    dynamic flag = false;
     if (funcType == 0) {
       List<String> problem =
           List.generate(mProblemModel.problemList.length, (index) {
@@ -107,6 +107,21 @@ class SingleContestModel extends ChangeNotifier {
       flag = await mUser.requestUsersInfo(contestId, args[0], problem, args[1]);
     } else if (funcType == 1) {
       mUser.rankSearchSort();
+    } else if (funcType == 2) {
+      mUser.userSearchSort();
+    } else if (funcType == 3) {
+      List<String> problem =
+          List.generate(mProblemModel.problemList.length, (index) {
+        return mProblemModel.problemList[index].problemId;
+      });
+      List<String> tempList = [];
+      for (int i = 1; i < args.length; i++) {
+        tempList.add(args[i]);
+      }
+      flag = await mUser.userOperate(contestId, args[0], tempList,
+          problem: problem);
+    } else if (funcType == 4) {
+      flag = await mUser.addUsersFromFile(contestId);
     }
     notifyListeners();
     return flag;
