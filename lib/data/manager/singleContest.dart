@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/contestRouteData/problems.dart';
 import 'package:owo_user/data/manager/contestRouteData/status.dart';
+import 'package:owo_user/data/manager/contestRouteData/user.dart';
 
 //一场比赛的内部数据
 //这里是比赛模块的第二层，展示的页面有 :
@@ -16,6 +17,7 @@ import 'package:owo_user/data/manager/contestRouteData/status.dart';
 class SingleContestModel extends ChangeNotifier {
   MProblemModel mProblemModel = MProblemModel();
   Status status = Status();
+  MUser mUser = MUser();
   int routeId = 0;
 
   //坏处就是存在冗余数据,因为这里是一个为了管理下面的路由的一个中间节点，所以它本身是不应该有数据的，而且这里依赖了上层的数据，
@@ -31,11 +33,13 @@ class SingleContestModel extends ChangeNotifier {
   }
 
   //切换路由
-  Future<void> switchRouteId(int id) async {
+  Future<void> switchRouteId(int id, String startTime) async {
     if (routeId != id) {
       routeId = id;
       if (routeId == 1) {
         await statusOperate(false);
+      } else if (routeId == 2 || routeId == 4) {
+        await userOperate(0, [false,startTime]);
       }
       notifyListeners();
     }
@@ -79,6 +83,7 @@ class SingleContestModel extends ChangeNotifier {
     notifyListeners();
     return flag;
   }
+
   //FIXME 该方法的正确性未测试
   Future<bool> statusDownloadCodeFile(int showStatusId) async {
     bool flag = await status.downloadCodeFile(contestId, showStatusId);
@@ -91,4 +96,19 @@ class SingleContestModel extends ChangeNotifier {
     notifyListeners();
   }
 
+//  =================================user==========================================
+  Future<bool> userOperate(int funcType, List<dynamic> args) async {
+    bool flag = false;
+    if (funcType == 0) {
+      List<String> problem =
+          List.generate(mProblemModel.problemList.length, (index) {
+        return mProblemModel.problemList[index].problemId;
+      });
+      flag = await mUser.requestUsersInfo(contestId, args[0], problem, args[1]);
+    } else if (funcType == 1) {
+      mUser.rankSearchSort();
+    }
+    notifyListeners();
+    return flag;
+  }
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:owo_user/data/manager/constData.dart';
 import 'package:owo_user/data/manager/contests.dart';
+import 'package:owo_user/data/manager/dataOne.dart';
 import 'package:owo_user/data/manager/singleContest.dart';
 import 'package:owo_user/data/myProvider.dart';
 import 'package:owo_user/pages/manager/contestRoutes/problem.dart';
+import 'package:owo_user/pages/manager/contestRoutes/rank.dart';
 import 'package:owo_user/pages/manager/contestRoutes/status.dart';
+import 'package:owo_user/pages/manager/contestRoutes/user.dart';
 
 //它的状态是 3
 class SingleContest extends StatelessWidget {
@@ -37,6 +40,10 @@ class SingleContest extends StatelessWidget {
               return const ProblemRoute();
             } else if (routeId == 1) {
               return const MStatus();
+            } else if (routeId == 2) {
+              return const MRank();
+            } else if(routeId == 4){
+              return const MUserRoute();
             }
             return Container();
           })),
@@ -71,8 +78,16 @@ class _MidRoute extends StatelessWidget {
                         width: 4.0))),
             child: TextButton(
               onPressed: () async {
+                String startTime =
+                    ChangeNotifierProvider.of<MGlobalData>(context)
+                        .contestModel
+                        .showContestList[
+                            ChangeNotifierProvider.of<MGlobalData>(context)
+                                .contestModel
+                                .selectContestId]
+                        .startTime;
                 await ChangeNotifierProvider.of<SingleContestModel>(context)
-                    .switchRouteId(index);
+                    .switchRouteId(index, startTime);
               },
               child: Text(
                 MConstantData.contestRoutes[index],

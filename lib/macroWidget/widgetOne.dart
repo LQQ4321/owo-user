@@ -325,9 +325,11 @@ class _FilletCornerInputState extends State<FilletCornerInput> {
                     fontWeight: FontWeight.w600),
                 controller: widget.textEditingController,
                 onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    widget.callBack(value);
-                  }
+                  widget.callBack(value);
+                  //不判断是否为空了，这样上层的数据处理就会更加灵活
+                  // if (value.isNotEmpty) {
+                  //   widget.callBack(value);
+                  // }
                 },
                 decoration: InputDecoration(
                   border: InputBorder.none,

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class MConstantData {
+  //{studentName,schoolName},{studentNumber,password},{login},{delete}
+  //{studentNumber,password}修改的时候记得保持studentNumber唯一
+  static const List<String> userInfoList = ['Player', 'Id & Password', 'Login Time', ''];
+  static const List<int> userInfoRatio = [1, 1, 1, 1];
+
   static const List<String> submitInfo = [
     'When',
     'Author',

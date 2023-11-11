@@ -77,9 +77,13 @@ class ContestModel extends ChangeNotifier {
   //根据子串来搜索比赛
   void searchContest(String contestKeyWord) {
     showContestList.clear();
-    for (int i = 0; i < contestList.length; i++) {
-      if (contestList[i].contestName.contains(contestKeyWord)) {
-        showContestList.add(contestList[i]);
+    if (contestKeyWord.isEmpty) {
+      showContestList = [...contestList];
+    } else {
+      for (int i = 0; i < contestList.length; i++) {
+        if (contestList[i].contestName.contains(contestKeyWord)) {
+          showContestList.add(contestList[i]);
+        }
       }
     }
     notifyListeners();
